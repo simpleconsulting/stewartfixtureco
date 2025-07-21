@@ -9,9 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings } from "lucide-react";
+import { pricingMatrix, calculateTotal, getAllCategories, getServicesByCategory } from "@/data/pricing";
 
 const topServices = [
   {
@@ -42,24 +43,67 @@ const topServices = [
 
 const serviceAreas = ["Spring Hill", "Thompson's Station", "Columbia"];
 
+const allServices = pricingMatrix;
+
 export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    service: "",
+    serviceQuantities: {} as Record<string, number>,
     address: "",
     message: ""
   });
+  
+  const [calculatedQuote, setCalculatedQuote] = useState<number | null>(null);
+  const [showQuote, setShowQuote] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleServiceToggle = (serviceId: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceQuantities: checked 
+        ? { ...prev.serviceQuantities, [serviceId]: 1 } // Default to 1 when checked
+        : Object.fromEntries(Object.entries(prev.serviceQuantities).filter(([id]) => id !== serviceId))
+    }));
+  };
+
+  const handleServiceQuantityChange = (serviceId: string, quantity: number) => {
+    if (quantity > 0) {
+      setFormData(prev => ({
+        ...prev,
+        serviceQuantities: { ...prev.serviceQuantities, [serviceId]: quantity }
+      }));
+    }
+  };
+  
+  const getSelectedServices = () => {
+    return Object.keys(formData.serviceQuantities);
+  };
+  
+  const getTotalServiceCount = () => {
+    return Object.values(formData.serviceQuantities).reduce((sum, qty) => sum + qty, 0);
+  };
+  
+  const getCurrentTotal = () => {
+    return calculateTotal(formData.serviceQuantities);
+  };
+  
+  const getCurrentTotalWithDiscount = () => {
+    const total = getCurrentTotal();
+    const serviceCount = getTotalServiceCount();
+    return serviceCount >= 3 ? Math.round(total * 0.9) : total;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission here
+    const quote = calculateTotal(formData.serviceQuantities);
+    setCalculatedQuote(quote);
+    setShowQuote(true);
+    console.log("Form submitted:", formData, "Quote:", quote);
   };
 
   return (
@@ -98,86 +142,362 @@ export default function Home() {
                       Get Free Quote
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Schedule Your Service</DialogTitle>
+                  <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl">
+                    <DialogHeader className="text-center pb-4">
+                      <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
+                      <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                       <div>
-                        <Label htmlFor="name">Full Name</Label>
+                        <Label htmlFor="name" className="text-[#283618] font-semibold">Full Name</Label>
                         <Input
                           id="name"
                           value={formData.name}
                           onChange={(e) => handleInputChange("name", e.target.value)}
+                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          placeholder="Enter your full name"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email" className="text-[#283618] font-semibold">Email Address</Label>
                         <Input
                           id="email"
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange("email", e.target.value)}
+                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          placeholder="your@email.com"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone" className="text-[#283618] font-semibold">Phone Number</Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => handleInputChange("phone", e.target.value)}
+                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          placeholder="(815) 555-0123"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="service">Service Needed</Label>
-                        <Select onValueChange={(value) => handleInputChange("service", value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a service" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {topServices.map((service, index) => (
-                              <SelectItem key={index} value={service.title}>
-                                {service.title} - {service.price}
-                              </SelectItem>
-                            ))}
-                            <SelectItem value="Other">Other Service</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label className="text-[#283618] font-semibold">Services Needed</Label>
+                        <div className="mt-2 max-h-64 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                          {getAllCategories().map(category => (
+                            <div key={category} className="mb-6">
+                              <h4 className="font-semibold text-[#606C38] text-sm mb-3">{category}</h4>
+                              {getServicesByCategory(category).map(service => (
+                                <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-3 flex-1">
+                                      <Checkbox
+                                        id={service.id}
+                                        checked={service.id in formData.serviceQuantities}
+                                        onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
+                                        className="border-[#DDA15E]/30"
+                                      />
+                                      <Label 
+                                        htmlFor={service.id}
+                                        className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                      >
+                                        {service.name}
+                                      </Label>
+                                    </div>
+                                    {service.id in formData.serviceQuantities && (
+                                      <div className="flex items-center space-x-2">
+                                        <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                        <Input
+                                          type="number"
+                                          min="1"
+                                          max="10"
+                                          value={formData.serviceQuantities[service.id] || 1}
+                                          onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                          className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                        {getSelectedServices().length > 0 && (
+                          <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
+                                <p className="text-xs text-[#606C38]">
+                                  {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                                  {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
+                                  <div>
+                                    <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
+                                    <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                  </div>
+                                ) : (
+                                  <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div>
-                        <Label htmlFor="address">Service Address</Label>
+                        <Label htmlFor="address" className="text-[#283618] font-semibold">Service Address</Label>
                         <Input
                           id="address"
                           value={formData.address}
                           onChange={(e) => handleInputChange("address", e.target.value)}
+                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
                           placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="message">Additional Details</Label>
+                        <Label htmlFor="message" className="text-[#283618] font-semibold">Additional Details</Label>
                         <Textarea
                           id="message"
                           value={formData.message}
                           onChange={(e) => handleInputChange("message", e.target.value)}
+                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1 resize-none"
                           placeholder="Tell us more about your project..."
                           rows={3}
                         />
                       </div>
-                      <Button type="submit" className="w-full">
-                        Request Quote
-                      </Button>
+                      {showQuote && calculatedQuote !== null ? (
+                        <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                          <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
+                          <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
+                          <p className="text-sm opacity-90">
+                            {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
+                          </p>
+                          <p className="text-sm opacity-90 mt-1">
+                            No hidden fees • Flat-rate pricing • Same-day response
+                          </p>
+                          <Button 
+                            type="button"
+                            onClick={() => {
+                              setShowQuote(false);
+                              setCalculatedQuote(null);
+                            }}
+                            className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                          >
+                            Edit Services
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          type="submit" 
+                          disabled={getSelectedServices().length === 0}
+                          className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Calculate My Quote
+                        </Button>
+                      )}
+                      <p className="text-center text-sm text-[#606C38] mt-3">
+                        {getSelectedServices().length === 0 ? "Please select at least one service" : "No obligation • Same-day response • Serving Middle TN"}
+                      </p>
                     </form>
                   </DialogContent>
                 </Dialog>
                 
-                <Button variant="outline" size="lg" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#DDA15E]/50 text-[#DDA15E] hover:bg-[#DDA15E]/10 backdrop-blur-sm">
-                  View Services
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="lg" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#DDA15E]/50 text-[#DDA15E] hover:bg-[#DDA15E]/10 backdrop-blur-sm">
+                      View Services
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-6xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader className="text-center pb-4">
+                      <DialogTitle className="text-3xl font-bold text-[#283618] mb-2">Our Complete Service List</DialogTitle>
+                      <p className="text-[#606C38] text-lg">Professional installation with transparent flat-rate pricing</p>
+                    </DialogHeader>
+                    <div className="grid gap-8 pt-4">
+                      {Object.entries(
+                        allServices.reduce((acc, service) => {
+                          if (!acc[service.category]) {
+                            acc[service.category] = [];
+                          }
+                          acc[service.category].push(service);
+                          return acc;
+                        }, {} as Record<string, typeof allServices>)
+                      ).map(([category, services]) => (
+                        <div key={category} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-[#DDA15E]/20">
+                          <h3 className="text-xl font-bold text-[#283618] mb-4 border-b border-[#DDA15E]/30 pb-2">
+                            {category}
+                          </h3>
+                          <div className="grid gap-3">
+                            {services.map((service, index) => (
+                              <div key={index} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 transition-colors">
+                                <div className="text-[#606C38] font-medium">{service.name}</div>
+                                {service.description && (
+                                  <div className="text-sm text-[#606C38]/70 mt-1">{service.description}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-[#DDA15E]/30 text-center">
+                      <p className="text-[#606C38] mb-4">Ready to get started?</p>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold">
+                            <Phone className="mr-2 h-5 w-5" />
+                            Get Free Quote
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl">
+                          <DialogHeader className="text-center pb-4">
+                            <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
+                            <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
+                          </DialogHeader>
+                          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="services-name" className="text-[#283618] font-semibold">Full Name</Label>
+                                <Input
+                                  id="services-name"
+                                  value={formData.name}
+                                  onChange={(e) => handleInputChange("name", e.target.value)}
+                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  placeholder="Enter your full name"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="services-email" className="text-[#283618] font-semibold">Email Address</Label>
+                                <Input
+                                  id="services-email"
+                                  type="email"
+                                  value={formData.email}
+                                  onChange={(e) => handleInputChange("email", e.target.value)}
+                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  placeholder="your@email.com"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="services-phone" className="text-[#283618] font-semibold">Phone Number</Label>
+                                <Input
+                                  id="services-phone"
+                                  type="tel"
+                                  value={formData.phone}
+                                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  placeholder="(815) 555-0123"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="services-address" className="text-[#283618] font-semibold">Service Address</Label>
+                                <Input
+                                  id="services-address"
+                                  value={formData.address}
+                                  onChange={(e) => handleInputChange("address", e.target.value)}
+                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
+                                  required
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-[#283618] font-semibold">Services Needed</Label>
+                              <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                                {getAllCategories().map(category => (
+                                  <div key={category} className="mb-4">
+                                    <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                                    {getServicesByCategory(category).map(service => (
+                                      <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center space-x-3 flex-1">
+                                            <Checkbox
+                                              id={`services-${service.id}`}
+                                              checked={service.id in formData.serviceQuantities}
+                                              onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
+                                              className="border-[#DDA15E]/30"
+                                            />
+                                            <Label 
+                                              htmlFor={`services-${service.id}`}
+                                              className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                            >
+                                              {service.name}
+                                            </Label>
+                                          </div>
+                                          {service.id in formData.serviceQuantities && (
+                                            <div className="flex items-center space-x-2">
+                                              <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                              <Input
+                                                type="number"
+                                                min="1"
+                                                max="10"
+                                                value={formData.serviceQuantities[service.id] || 1}
+                                                onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                                className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                              />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+                              {getSelectedServices().length > 0 && (
+                                <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
+                                      <p className="text-xs text-[#606C38]">
+                                        {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                                        {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
+                                        <div>
+                                          <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
+                                          <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                        </div>
+                                      ) : (
+                                        <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <Label htmlFor="services-message" className="text-[#283618] font-semibold">Additional Details</Label>
+                              <Textarea
+                                id="services-message"
+                                value={formData.message}
+                                onChange={(e) => handleInputChange("message", e.target.value)}
+                                className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1 resize-none"
+                                placeholder="Tell us more about your project..."
+                                rows={3}
+                              />
+                            </div>
+                            <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
+                              Get My Free Quote
+                            </Button>
+                            <p className="text-center text-sm text-[#606C38] mt-3">
+                              No obligation • Same-day response • Serving Middle TN
+                            </p>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             
@@ -276,7 +596,7 @@ export default function Home() {
                               Get Quote
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-md">
+                          <DialogContent className="max-w-2xl">
                             <DialogHeader>
                               <DialogTitle>Schedule Your {service.title}</DialogTitle>
                             </DialogHeader>
@@ -321,18 +641,98 @@ export default function Home() {
                                 />
                               </div>
                               <div>
+                                <Label className="text-[#283618] font-semibold">Services Needed</Label>
+                                <div className="mt-2 max-h-32 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-3 bg-white">
+                                  {getAllCategories().map(category => (
+                                    <div key={category} className="mb-3">
+                                      <h4 className="font-semibold text-[#606C38] text-xs mb-1">{category}</h4>
+                                      {getServicesByCategory(category).map(svc => (
+                                        <div key={svc.id} className="mb-1">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-2 flex-1">
+                                              <Checkbox
+                                                id={`desktop-${index}-${svc.id}`}
+                                                checked={svc.id in formData.serviceQuantities}
+                                                onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
+                                                className="border-[#DDA15E]/30"
+                                              />
+                                              <Label 
+                                                htmlFor={`desktop-${index}-${svc.id}`}
+                                                className="text-xs text-[#606C38] font-medium cursor-pointer"
+                                              >
+                                                {svc.name}
+                                              </Label>
+                                            </div>
+                                            {svc.id in formData.serviceQuantities && (
+                                              <div className="flex items-center space-x-1">
+                                                <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  max="10"
+                                                  value={formData.serviceQuantities[svc.id] || 1}
+                                                  onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                  className="w-12 h-6 text-xs text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ))}
+                                </div>
+                                {getSelectedServices().length > 0 && (
+                                  <div className="mt-3 p-3 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-lg border border-[#DDA15E]/30">
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <p className="text-xs font-semibold text-[#283618]">Total:</p>
+                                        <p className="text-xs text-[#606C38]">
+                                          {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                                        </p>
+                                      </div>
+                                      <p className="text-lg font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <div>
                                 <Label htmlFor={`desktop-message-${index}`}>Additional Details</Label>
                                 <Textarea
                                   id={`desktop-message-${index}`}
                                   value={formData.message}
                                   onChange={(e) => handleInputChange("message", e.target.value)}
-                                  placeholder={`Tell us about your ${service.title.toLowerCase()} needs...`}
+                                  placeholder="Tell us about your project needs..."
                                   rows={3}
                                 />
                               </div>
-                              <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
-                                Request Quote
-                              </Button>
+                              {showQuote && calculatedQuote !== null ? (
+                                <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-4 text-center text-white">
+                                  <h3 className="text-lg font-bold mb-1">Your Quote</h3>
+                                  <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
+                                  <p className="text-xs opacity-90">
+                                    {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} selected
+                                  </p>
+                                  <Button 
+                                    type="button"
+                                    onClick={() => {
+                                      setShowQuote(false);
+                                      setCalculatedQuote(null);
+                                    }}
+                                    className="mt-2 bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs py-1"
+                                  >
+                                    Edit Services
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button 
+                                  type="submit" 
+                                  disabled={getSelectedServices().length === 0}
+                                  className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50"
+                                >
+                                  Calculate Quote
+                                </Button>
+                              )}
                             </form>
                           </DialogContent>
                         </Dialog>
@@ -371,7 +771,7 @@ export default function Home() {
                             Get Quote
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-md">
+                        <DialogContent className="max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>Schedule Your {service.title}</DialogTitle>
                           </DialogHeader>
@@ -416,18 +816,98 @@ export default function Home() {
                               />
                             </div>
                             <div>
+                              <Label className="text-[#283618] font-semibold">Services Needed</Label>
+                              <div className="mt-2 max-h-32 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-3 bg-white">
+                                {getAllCategories().map(category => (
+                                  <div key={category} className="mb-3">
+                                    <h4 className="font-semibold text-[#606C38] text-xs mb-1">{category}</h4>
+                                    {getServicesByCategory(category).map(svc => (
+                                      <div key={svc.id} className="mb-1">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center space-x-2 flex-1">
+                                            <Checkbox
+                                              id={`mobile-${index}-${svc.id}`}
+                                              checked={svc.id in formData.serviceQuantities}
+                                              onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
+                                              className="border-[#DDA15E]/30"
+                                            />
+                                            <Label 
+                                              htmlFor={`mobile-${index}-${svc.id}`}
+                                              className="text-xs text-[#606C38] font-medium cursor-pointer"
+                                            >
+                                              {svc.name}
+                                            </Label>
+                                          </div>
+                                          {svc.id in formData.serviceQuantities && (
+                                            <div className="flex items-center space-x-1">
+                                              <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                              <Input
+                                                type="number"
+                                                min="1"
+                                                max="10"
+                                                value={formData.serviceQuantities[svc.id] || 1}
+                                                onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                className="w-12 h-6 text-xs text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                              />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+                              {getSelectedServices().length > 0 && (
+                                <div className="mt-3 p-3 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-lg border border-[#DDA15E]/30">
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <p className="text-xs font-semibold text-[#283618]">Total:</p>
+                                      <p className="text-xs text-[#606C38]">
+                                        {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                                      </p>
+                                    </div>
+                                    <p className="text-lg font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div>
                               <Label htmlFor={`mobile-message-${index}`}>Additional Details</Label>
                               <Textarea
                                 id={`mobile-message-${index}`}
                                 value={formData.message}
                                 onChange={(e) => handleInputChange("message", e.target.value)}
-                                placeholder={`Tell us about your ${service.title.toLowerCase()} needs...`}
+                                placeholder="Tell us about your project needs..."
                                 rows={3}
                               />
                             </div>
-                            <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
-                              Request Quote
-                            </Button>
+                            {showQuote && calculatedQuote !== null ? (
+                              <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-4 text-center text-white">
+                                <h3 className="text-lg font-bold mb-1">Your Quote</h3>
+                                <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
+                                <p className="text-xs opacity-90">
+                                  {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} selected
+                                </p>
+                                <Button 
+                                  type="button"
+                                  onClick={() => {
+                                    setShowQuote(false);
+                                    setCalculatedQuote(null);
+                                  }}
+                                  className="mt-2 bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs py-1"
+                                >
+                                  Edit Services
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button 
+                                type="submit" 
+                                disabled={getSelectedServices().length === 0}
+                                className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50"
+                              >
+                                Calculate Quote
+                              </Button>
+                            )}
                           </form>
                         </DialogContent>
                       </Dialog>
@@ -456,7 +936,7 @@ export default function Home() {
                   Get Bundle Quote
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Bundle Services & Save 10%</DialogTitle>
                 </DialogHeader>
@@ -501,18 +981,119 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="bundle-message">What services are you interested in?</Label>
+                    <Label className="text-[#283618] font-semibold">Services to Bundle (Need 3+ total services for 10% discount)</Label>
+                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                      {getAllCategories().map(category => (
+                        <div key={category} className="mb-4">
+                          <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                          {getServicesByCategory(category).map(service => (
+                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3 flex-1">
+                                  <Checkbox
+                                    id={`bundle-${service.id}`}
+                                    checked={service.id in formData.serviceQuantities}
+                                    onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
+                                    className="border-[#DDA15E]/30"
+                                  />
+                                  <Label 
+                                    htmlFor={`bundle-${service.id}`}
+                                    className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                  >
+                                    {service.name}
+                                  </Label>
+                                </div>
+                                {service.id in formData.serviceQuantities && (
+                                  <div className="flex items-center space-x-2">
+                                    <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                    <Input
+                                      type="number"
+                                      min="1"
+                                      max="10"
+                                      value={formData.serviceQuantities[service.id] || 1}
+                                      onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                      className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                    {getSelectedServices().length > 0 && (
+                      <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-semibold text-[#283618]">Bundle Total:</p>
+                            <p className="text-xs text-[#606C38]">
+                              {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                              {getTotalServiceCount() >= 3 ? " • 10% Bundle Discount Applied!" : " • Need 3+ for 10% off"}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
+                              <div>
+                                <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
+                                <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                              </div>
+                            ) : (
+                              <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="bundle-message">Additional Details</Label>
                     <Textarea
                       id="bundle-message"
                       value={formData.message}
                       onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="List the services you're interested in bundling..."
-                      rows={4}
+                      placeholder="Tell us more about your project..."
+                      rows={3}
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
-                    Get Bundle Quote
-                  </Button>
+                  {showQuote && calculatedQuote !== null ? (
+                    <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                      <h3 className="text-2xl font-bold mb-2">Your Bundle Quote</h3>
+                      <div className="text-4xl font-bold mb-2">
+                        ${getTotalServiceCount() >= 3 ? Math.round(calculatedQuote * 0.9) : calculatedQuote}
+                      </div>
+                      {getTotalServiceCount() >= 3 && (
+                        <div className="text-sm opacity-90 mb-2">
+                          <span className="line-through">${calculatedQuote}</span> • 10% Bundle Discount Applied!
+                        </div>
+                      )}
+                      <p className="text-sm opacity-90">
+                        {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
+                        {getTotalServiceCount() >= 3 ? ' • Bundle Discount Applied!' : ' • Need 3+ total services for 10% off'}
+                      </p>
+                      <p className="text-sm opacity-90 mt-1">
+                        No hidden fees • Flat-rate pricing • Same-day response
+                      </p>
+                      <Button 
+                        type="button"
+                        onClick={() => {
+                          setShowQuote(false);
+                          setCalculatedQuote(null);
+                        }}
+                        className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                      >
+                        Edit Services
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      type="submit" 
+                      disabled={getSelectedServices().length === 0}
+                      className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {getTotalServiceCount() >= 3 ? 'Calculate Bundle Quote (10% Off!)' : 'Calculate Quote'}
+                    </Button>
+                  )}
                 </form>
               </DialogContent>
             </Dialog>
@@ -601,7 +1182,7 @@ export default function Home() {
                   Schedule Service Now
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Schedule Your Service</DialogTitle>
                 </DialogHeader>
@@ -636,20 +1217,70 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="service2">Service Needed</Label>
-                    <Select onValueChange={(value) => handleInputChange("service", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {topServices.map((service, index) => (
-                          <SelectItem key={index} value={service.title}>
-                            {service.title} - {service.price}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="Other">Other Service</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-[#283618] font-semibold">Services Needed (Select All That Apply)</Label>
+                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                      {getAllCategories().map(category => (
+                        <div key={category} className="mb-4">
+                          <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                          {getServicesByCategory(category).map(service => (
+                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3 flex-1">
+                                  <Checkbox
+                                    id={`footer-${service.id}`}
+                                    checked={service.id in formData.serviceQuantities}
+                                    onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
+                                    className="border-[#DDA15E]/30"
+                                  />
+                                  <Label 
+                                    htmlFor={`footer-${service.id}`}
+                                    className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                  >
+                                    {service.name}
+                                  </Label>
+                                </div>
+                                {service.id in formData.serviceQuantities && (
+                                  <div className="flex items-center space-x-2">
+                                    <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                    <Input
+                                      type="number"
+                                      min="1"
+                                      max="10"
+                                      value={formData.serviceQuantities[service.id] || 1}
+                                      onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                      className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                    {getSelectedServices().length > 0 && (
+                      <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
+                            <p className="text-xs text-[#606C38]">
+                              {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                              {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
+                              <div>
+                                <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
+                                <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                              </div>
+                            ) : (
+                              <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="address2">Service Address</Label>
@@ -671,9 +1302,36 @@ export default function Home() {
                       rows={3}
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Request Quote
-                  </Button>
+                  {showQuote && calculatedQuote !== null ? (
+                    <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                      <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
+                      <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
+                      <p className="text-sm opacity-90">
+                        {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
+                      </p>
+                      <p className="text-sm opacity-90 mt-1">
+                        No hidden fees • Flat-rate pricing • Same-day response
+                      </p>
+                      <Button 
+                        type="button"
+                        onClick={() => {
+                          setShowQuote(false);
+                          setCalculatedQuote(null);
+                        }}
+                        className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                      >
+                        Edit Services
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      type="submit" 
+                      disabled={getSelectedServices().length === 0}
+                      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Calculate Quote
+                    </Button>
+                  )}
                 </form>
               </DialogContent>
             </Dialog>
