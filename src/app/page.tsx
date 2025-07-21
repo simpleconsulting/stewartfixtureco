@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings, Plus, Minus } from "lucide-react";
+import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Plus, Minus } from "lucide-react";
 import { pricingMatrix, calculateTotal, getAllCategories, getServicesByCategory } from "@/data/pricing";
 
 const topServices = [
@@ -20,7 +20,7 @@ const topServices = [
     headline: "Need a Ceiling Fan Installed? We'll Have it Spinning Today.",
     price: "$200",
     description: "Professional installation at any height. No risk, no hassle, just cool comfort.",
-    icon: Fan,
+    image: "/ceiling-fan-Installation.png",
     iconColor: "from-[#FCA311] to-[#000000]"
   },
   {
@@ -28,7 +28,7 @@ const topServices = [
     headline: "Refresh Any Room with a Fast, Professional Light Fixture Swap.",
     price: "Starting at $150",
     description: "Transform your space instantly. From vanity lights to chandeliers, we do it all.",
-    icon: Lightbulb,
+    image: "/pendant-light.png",
     iconColor: "from-[#000000] to-[#FCA311]"
   },
   {
@@ -36,7 +36,7 @@ const topServices = [
     headline: "Modernize Your Home with New Switches, Dimmers & Outlets.",
     price: "Starting at $125", 
     description: "GFCI outlets, USB ports, smart switches, and dimmer installations for safety and convenience.",
-    icon: Settings,
+    image: "/lightswitch.png",
     iconColor: "from-[#14213D] to-[#000000]"
   }
 ];
@@ -633,12 +633,17 @@ export default function Home() {
           <div className="hidden lg:block">
             <div className="grid grid-cols-3 gap-8 max-w-7xl mx-auto">
               {topServices.map((service, index) => {
-                const IconComponent = service.icon;
                 return (
                   <Card key={index} className="bg-white border-0 shadow-2xl rounded-3xl overflow-hidden h-[600px]">
                     <CardContent className="p-8 h-full flex flex-col justify-center text-center">
-                      <div className={`inline-flex p-5 rounded-3xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-xl mx-auto`}>
-                        <IconComponent className="h-12 w-12 text-white" />
+                      <div className="bg-gray-50 rounded-3xl mb-6 shadow-inner mx-auto w-24 h-24 overflow-hidden">
+                        <Image
+                          src={service.image}
+                          alt={service.title}
+                          width={96}
+                          height={96}
+                          className="w-24 h-24 object-cover"
+                        />
                       </div>
                       <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
                         {service.title}
@@ -831,12 +836,17 @@ export default function Home() {
           {/* Mobile Stacked Cards */}
           <div className="lg:hidden space-y-8">
             {topServices.map((service, index) => {
-              const IconComponent = service.icon;
               return (
                 <Card key={index} className="bg-white border-0 shadow-xl rounded-2xl overflow-hidden">
                   <CardContent className="p-8 text-center">
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-lg`}>
-                      <IconComponent className="h-12 w-12 text-white" />
+                    <div className="bg-gray-50 rounded-2xl mb-6 shadow-inner mx-auto w-20 h-20 overflow-hidden">
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 object-cover"
+                      />
                     </div>
                     <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
                       {service.title}
@@ -1232,8 +1242,17 @@ export default function Home() {
       </section>
 
       {/* Additional Services */}
-      <section className="py-16 bg-[#E5E5E5]">
-        <div className="container mx-auto max-w-4xl px-4 text-center">
+      <section className="py-16 bg-[#E5E5E5] relative overflow-hidden">
+        <div className="absolute top-4 right-4 opacity-5 pointer-events-none">
+          <Image
+            src="/ceiling-fan-Installation.png"
+            alt=""
+            width={200}
+            height={200}
+            className="w-48 h-48 object-contain"
+          />
+        </div>
+        <div className="container mx-auto max-w-4xl px-4 text-center relative z-10">
           <h2 className="text-3xl lg:text-4xl font-bold text-[#14213D] mb-6">
             We Also Handle
           </h2>
