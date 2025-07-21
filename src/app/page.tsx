@@ -4,12 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings } from "lucide-react";
 
 const topServices = [
@@ -23,7 +25,7 @@ const topServices = [
   },
   {
     title: "Light Fixture & Pendant Swaps", 
-    headline: "Refresh Any Room with a Fast, Professional Fixture Swap.",
+    headline: "Refresh Any Room with a Fast, Professional Light Fixture Swap.",
     price: "Starting at $150",
     description: "Transform your space instantly. From vanity lights to chandeliers, we do it all.",
     icon: Lightbulb,
@@ -247,103 +249,194 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="space-y-20">
+          {/* Desktop Grid */}
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {topServices.map((service, index) => {
+                const IconComponent = service.icon;
+                return (
+                  <Card key={index} className="bg-white border-0 shadow-2xl rounded-3xl overflow-hidden h-[600px]">
+                    <CardContent className="p-8 h-full flex flex-col justify-center text-center">
+                      <div className={`inline-flex p-5 rounded-3xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-xl mx-auto`}>
+                        <IconComponent className="h-12 w-12 text-white" />
+                      </div>
+                      <h2 className="text-xl font-bold text-[#BC6C25] mb-4 uppercase tracking-wide">
+                        {service.title}
+                      </h2>
+                      <h3 className="text-2xl font-bold text-[#283618] mb-4 leading-tight">
+                        {service.headline}
+                      </h3>
+                      <p className="text-base text-[#606C38] mb-6 leading-relaxed">
+                        {service.description}
+                      </p>
+                      <div className="flex flex-col items-center gap-4 mt-auto">
+                        <div className="text-4xl font-bold text-[#BC6C25]">{service.price}</div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold w-full">
+                              Get Quote
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Schedule Your {service.title}</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                              <div>
+                                <Label htmlFor={`desktop-name-${index}`}>Full Name</Label>
+                                <Input
+                                  id={`desktop-name-${index}`}
+                                  value={formData.name}
+                                  onChange={(e) => handleInputChange("name", e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`desktop-email-${index}`}>Email</Label>
+                                <Input
+                                  id={`desktop-email-${index}`}
+                                  type="email"
+                                  value={formData.email}
+                                  onChange={(e) => handleInputChange("email", e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`desktop-phone-${index}`}>Phone Number</Label>
+                                <Input
+                                  id={`desktop-phone-${index}`}
+                                  type="tel"
+                                  value={formData.phone}
+                                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`desktop-address-${index}`}>Service Address</Label>
+                                <Input
+                                  id={`desktop-address-${index}`}
+                                  value={formData.address}
+                                  onChange={(e) => handleInputChange("address", e.target.value)}
+                                  placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor={`desktop-message-${index}`}>Additional Details</Label>
+                                <Textarea
+                                  id={`desktop-message-${index}`}
+                                  value={formData.message}
+                                  onChange={(e) => handleInputChange("message", e.target.value)}
+                                  placeholder={`Tell us about your ${service.title.toLowerCase()} needs...`}
+                                  rows={3}
+                                />
+                              </div>
+                              <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
+                                Request Quote
+                              </Button>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mobile Stacked Cards */}
+          <div className="lg:hidden space-y-8">
             {topServices.map((service, index) => {
               const IconComponent = service.icon;
               return (
-              <div key={index} className={`flex flex-col lg:flex-row items-center gap-16 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="flex-1 text-center lg:text-left">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-lg`}>
-                    <IconComponent className="h-12 w-12 text-white" />
-                  </div>
-                  <h3 className="text-3xl lg:text-4xl font-bold text-[#283618] mb-4 leading-tight">
-                    {service.headline}
-                  </h3>
-                  <p className="text-lg text-[#606C38] mb-8 leading-relaxed">
-                    {service.description}
-                  </p>
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
-                    <div className="text-4xl font-bold text-[#BC6C25]">{service.price}</div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold">
-                          Get Quote
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Schedule Your {service.title}</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <div>
-                            <Label htmlFor={`name-${index}`}>Full Name</Label>
-                            <Input
-                              id={`name-${index}`}
-                              value={formData.name}
-                              onChange={(e) => handleInputChange("name", e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`email-${index}`}>Email</Label>
-                            <Input
-                              id={`email-${index}`}
-                              type="email"
-                              value={formData.email}
-                              onChange={(e) => handleInputChange("email", e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`phone-${index}`}>Phone Number</Label>
-                            <Input
-                              id={`phone-${index}`}
-                              type="tel"
-                              value={formData.phone}
-                              onChange={(e) => handleInputChange("phone", e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`address-${index}`}>Service Address</Label>
-                            <Input
-                              id={`address-${index}`}
-                              value={formData.address}
-                              onChange={(e) => handleInputChange("address", e.target.value)}
-                              placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`message-${index}`}>Additional Details</Label>
-                            <Textarea
-                              id={`message-${index}`}
-                              value={formData.message}
-                              onChange={(e) => handleInputChange("message", e.target.value)}
-                              placeholder={`Tell us about your ${service.title.toLowerCase()} needs...`}
-                              rows={3}
-                            />
-                          </div>
-                          <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
-                            Request Quote
-                          </Button>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gradient-to-br from-[#FEFAE0] to-white rounded-3xl p-12 h-80 flex items-center justify-center shadow-lg border border-[#DDA15E]/20">
-                    <div className="text-center">
-                      <div className={`inline-flex p-6 rounded-3xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-xl`}>
-                        <IconComponent className="h-16 w-16 text-white" />
-                      </div>
-                      <h4 className="text-2xl font-bold text-[#283618]">{service.title}</h4>
+                <Card key={index} className="bg-white border-0 shadow-xl rounded-2xl overflow-hidden">
+                  <CardContent className="p-8 text-center">
+                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-lg`}>
+                      <IconComponent className="h-12 w-12 text-white" />
                     </div>
-                  </div>
-                </div>
-              </div>
-            );})}
+                    <h2 className="text-xl font-bold text-[#BC6C25] mb-4 uppercase tracking-wide">
+                      {service.title}
+                    </h2>
+                    <h3 className="text-2xl font-bold text-[#283618] mb-4 leading-tight">
+                      {service.headline}
+                    </h3>
+                    <p className="text-base text-[#606C38] mb-6 leading-relaxed">
+                      {service.description}
+                    </p>
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="text-3xl font-bold text-[#BC6C25]">{service.price}</div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold w-full">
+                            Get Quote
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Schedule Your {service.title}</DialogTitle>
+                          </DialogHeader>
+                          <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                              <Label htmlFor={`mobile-name-${index}`}>Full Name</Label>
+                              <Input
+                                id={`mobile-name-${index}`}
+                                value={formData.name}
+                                onChange={(e) => handleInputChange("name", e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`mobile-email-${index}`}>Email</Label>
+                              <Input
+                                id={`mobile-email-${index}`}
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => handleInputChange("email", e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`mobile-phone-${index}`}>Phone Number</Label>
+                              <Input
+                                id={`mobile-phone-${index}`}
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => handleInputChange("phone", e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`mobile-address-${index}`}>Service Address</Label>
+                              <Input
+                                id={`mobile-address-${index}`}
+                                value={formData.address}
+                                onChange={(e) => handleInputChange("address", e.target.value)}
+                                placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`mobile-message-${index}`}>Additional Details</Label>
+                              <Textarea
+                                id={`mobile-message-${index}`}
+                                value={formData.message}
+                                onChange={(e) => handleInputChange("message", e.target.value)}
+                                placeholder={`Tell us about your ${service.title.toLowerCase()} needs...`}
+                                rows={3}
+                              />
+                            </div>
+                            <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E]">
+                              Request Quote
+                            </Button>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
