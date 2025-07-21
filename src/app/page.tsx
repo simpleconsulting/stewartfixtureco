@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -142,7 +142,7 @@ export default function Home() {
                       Get Free Quote
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl">
+                  <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader className="text-center pb-4">
                       <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
                       <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
@@ -315,16 +315,9 @@ export default function Home() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-6xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader className="text-center pb-4 relative">
+                    <DialogHeader className="text-center pb-4">
                       <DialogTitle className="text-3xl font-bold text-[#283618] mb-2">Our Complete Service List</DialogTitle>
                       <p className="text-[#606C38] text-lg">Professional installation with transparent flat-rate pricing</p>
-                      {/* Extra close button for mobile accessibility */}
-                      <DialogClose className="absolute top-4 right-4 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-white">
-                        <span className="sr-only">Close</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-[#283618]">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </DialogClose>
                     </DialogHeader>
                     <div className="grid gap-8 pt-4">
                       {Object.entries(
@@ -363,7 +356,7 @@ export default function Home() {
                             Get Free Quote
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl">
+                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader className="text-center pb-4">
                             <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
                             <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
@@ -604,7 +597,7 @@ export default function Home() {
                               Get Quote
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>Schedule Your {service.title}</DialogTitle>
                             </DialogHeader>
@@ -779,7 +772,7 @@ export default function Home() {
                             Get Quote
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Schedule Your {service.title}</DialogTitle>
                           </DialogHeader>
@@ -944,7 +937,7 @@ export default function Home() {
                   Get Bundle Quote
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Bundle Services & Save 10%</DialogTitle>
                 </DialogHeader>
@@ -1190,7 +1183,7 @@ export default function Home() {
                   Schedule Service Now
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Schedule Your Service</DialogTitle>
                 </DialogHeader>
