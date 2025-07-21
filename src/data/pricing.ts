@@ -1,4 +1,4 @@
-// Stewart Fixture Co. Pricing Matrix
+// Stewart Services Pricing Matrix
 // Edit this file to update service pricing across the entire website
 
 export interface ServiceItem {

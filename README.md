@@ -1,4 +1,4 @@
-# Stewart Fixture Co. Website
+# Stewart Services Website
 
 Professional fixture installation services website built with Next.js 15, React 19, and Tailwind CSS.
 

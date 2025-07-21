@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Stewart Fixture Co. | Professional Fixture Installation",
+  title: "Stewart Services | Professional Fixture Installation",
   description: "Professional installation of light fixtures, ceiling fans, switches, outlets, and home hardware across Spring Hill, Thompson's Station, and Columbia TN. Transparent flat-rate pricing.",
 };
 

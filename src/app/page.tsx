@@ -130,7 +130,7 @@ export default function Home() {
             <div className="flex-1 text-center lg:text-left relative z-10">
               <div className="mb-8">
                 <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight tracking-wider mb-4">
-                  STEWART FIXTURE CO.
+                  STEWART SERVICES
                 </h1>
                 <div className="flex items-center justify-center lg:justify-start gap-2">
                   <div className="flex text-[#FCA311]">
@@ -1524,12 +1524,12 @@ export default function Home() {
               <div className="flex items-center gap-3 mb-4">
                 <Image
                   src="/icon.svg"
-                  alt="Stewart Fixture Co. Logo"
+                  alt="Stewart Services Logo"
                   width={40}
                   height={40}
                   className="w-10 h-10 filter brightness-0 invert"
                 />
-                <h3 className="text-2xl font-bold tracking-wider">STEWART FIXTURE CO.</h3>
+                <h3 className="text-2xl font-bold tracking-wider">STEWART SERVICES</h3>
               </div>
               <p className="text-[#E5E5E5]/70 leading-relaxed">
                 Professional fixture installation services across Middle Tennessee.
@@ -1561,7 +1561,7 @@ export default function Home() {
           </div>
           
           <div className="border-t border-[#14213D] mt-12 pt-8 text-center text-[#E5E5E5]/70">
-            <p>&copy; 2024 STEWART FIXTURE CO. All rights reserved.</p>
+            <p>&copy; 2024 STEWART SERVICES. All rights reserved.</p>
           </div>
         </div>
       </footer>
