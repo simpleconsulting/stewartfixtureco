@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings } from "lucide-react";
 
 const topServices = [
@@ -721,7 +720,7 @@ export default function Home() {
               <div className="text-[#FEFAE0]/70 space-y-3">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  <span>(555) 123-4567</span>
+                  <span>(815) 577-6393</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
