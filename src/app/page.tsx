@@ -127,7 +127,7 @@ export default function Home() {
               </div>
               
               <p className="text-2xl lg:text-3xl text-[#FCA311] font-semibold mb-6 tracking-wide">
-                &ldquo;Fixtures. Fans. Finishes. Installed Right.&rdquo;
+                &ldquo;Fixtures, fans, devices. Installed right.&rdquo;
               </p>
               
               <p className="text-lg lg:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed">
@@ -215,6 +215,7 @@ export default function Home() {
                                           max="10"
                                           value={formData.serviceQuantities[service.id] || 1}
                                           onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                          onFocus={(e) => e.target.select()}
                                           className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                         />
                                       </div>
@@ -442,6 +443,7 @@ export default function Home() {
                                                 max="10"
                                                 value={formData.serviceQuantities[service.id] || 1}
                                                 onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                                onFocus={(e) => e.target.select()}
                                                 className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                               />
                                             </div>
@@ -673,6 +675,7 @@ export default function Home() {
                                                   max="10"
                                                   value={formData.serviceQuantities[svc.id] || 1}
                                                   onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                onFocus={(e) => e.target.select()}
                                                   className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                                 />
                                               </div>
@@ -848,6 +851,7 @@ export default function Home() {
                                                 max="10"
                                                 value={formData.serviceQuantities[svc.id] || 1}
                                                 onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                onFocus={(e) => e.target.select()}
                                                 className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                               />
                                             </div>
@@ -1013,6 +1017,7 @@ export default function Home() {
                                       max="10"
                                       value={formData.serviceQuantities[service.id] || 1}
                                       onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                      onFocus={(e) => e.target.select()}
                                       className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                     />
                                   </div>
@@ -1109,14 +1114,14 @@ export default function Home() {
             We Also Handle
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[#000000] font-medium">
-            <div>Smart Home Devices</div>
-            <div>TV Mounting</div>
             <div>Cabinet Hardware</div>
             <div>Safety Updates</div>
-            <div>Under-Cabinet Lighting</div>
-            <div>Exhaust Fans</div>
             <div>Smoke Detectors</div>
             <div>Motion Sensors</div>
+            <div>Quick Fixes</div>
+            <div>Bundle Services</div>
+            <div>GFCI Outlets</div>
+            <div>3-Way Switches</div>
           </div>
           <p className="text-lg text-[#000000] mt-8 max-w-2xl mx-auto">
             From quick 30-minute fixes to full home upgrades — if it involves fixtures, switches, or hardware, we&apos;ve got you covered.
@@ -1249,6 +1254,7 @@ export default function Home() {
                                       max="10"
                                       value={formData.serviceQuantities[service.id] || 1}
                                       onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                      onFocus={(e) => e.target.select()}
                                       className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                     />
                                   </div>

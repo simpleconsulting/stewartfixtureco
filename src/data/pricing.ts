@@ -47,13 +47,6 @@ export const pricingMatrix: ServiceItem[] = [
     description: "Bathroom vanity lighting"
   },
   {
-    id: "under-cabinet-lighting",
-    category: "Lighting & Fixtures",
-    name: "Install Under-Cabinet Lighting",
-    price: 300,
-    description: "Kitchen under-cabinet LED installation"
-  },
-  {
     id: "motion-sensor-light",
     category: "Lighting & Fixtures",
     name: "Install Motion Sensor Light (Interior/Exterior)",
@@ -104,57 +97,6 @@ export const pricingMatrix: ServiceItem[] = [
     price: 150,
     description: "Ground fault protection outlet"
   },
-  {
-    id: "outlet-splitter",
-    category: "Switches & Outlets",
-    name: "Add Outlet Splitter Plate (2+ gangs)",
-    price: 100,
-    description: "Multi-gang outlet installation"
-  },
-  {
-    id: "smart-outlet-switch",
-    category: "Switches & Outlets",
-    name: "Install Smart Outlet/Switch (Wi-Fi)",
-    price: 175,
-    description: "Connected home automation"
-  },
-  
-  // Smart Home & Technology
-  {
-    id: "smart-thermostat",
-    category: "Smart Home & Technology",
-    name: "Mount Smart Thermostat",
-    price: 160,
-    description: "Digital climate control installation"
-  },
-  {
-    id: "doorbell-wired-wireless",
-    category: "Smart Home & Technology",
-    name: "Doorbell (Wired or Wireless) Install",
-    price: 150,
-    description: "Standard doorbell installation"
-  },
-  {
-    id: "smart-doorbell",
-    category: "Smart Home & Technology",
-    name: "Smart Doorbell (Ring, Nest) Install",
-    price: 175,
-    description: "Video doorbell installation"
-  },
-  {
-    id: "smart-lock",
-    category: "Smart Home & Technology",
-    name: "Smart Lock Install",
-    price: 150,
-    description: "Keyless entry installation"
-  },
-  {
-    id: "tv-mounting",
-    category: "Smart Home & Technology",
-    name: "TV Mounting with Cord Concealment",
-    price: 225,
-    description: "Professional TV wall mounting"
-  },
   
   // Safety & Ventilation
   {
@@ -163,13 +105,6 @@ export const pricingMatrix: ServiceItem[] = [
     name: "Replace/Install Smoke or CO2 Detector (Battery or Hardwired)",
     price: 100,
     description: "Safety device installation"
-  },
-  {
-    id: "bathroom-exhaust-fan",
-    category: "Safety & Ventilation",
-    name: "Bathroom Exhaust Fan Install",
-    price: 250,
-    description: "Ventilation fan installation"
   },
   
   // Hardware & Other
