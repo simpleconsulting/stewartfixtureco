@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings } from "lucide-react";
+import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Fan, Lightbulb, Settings, Plus, Minus } from "lucide-react";
 import { pricingMatrix, calculateTotal, getAllCategories, getServicesByCategory } from "@/data/pricing";
 
 const topServices = [
@@ -77,6 +77,20 @@ export default function Home() {
         ...prev,
         serviceQuantities: { ...prev.serviceQuantities, [serviceId]: quantity }
       }));
+    }
+  };
+
+  const incrementQuantity = (serviceId: string) => {
+    const currentQty = formData.serviceQuantities[serviceId] || 1;
+    if (currentQty < 10) {
+      handleServiceQuantityChange(serviceId, currentQty + 1);
+    }
+  };
+
+  const decrementQuantity = (serviceId: string) => {
+    const currentQty = formData.serviceQuantities[serviceId] || 1;
+    if (currentQty > 1) {
+      handleServiceQuantityChange(serviceId, currentQty - 1);
     }
   };
   
@@ -209,15 +223,37 @@ export default function Home() {
                                     {service.id in formData.serviceQuantities && (
                                       <div className="flex items-center space-x-2">
                                         <Label className="text-xs text-[#000000]">Qty:</Label>
-                                        <Input
-                                          type="number"
-                                          min="1"
-                                          max="10"
-                                          value={formData.serviceQuantities[service.id] || 1}
-                                          onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                          onFocus={(e) => e.target.select()}
-                                          className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                        />
+                                        <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                            onClick={() => decrementQuantity(service.id)}
+                                            disabled={formData.serviceQuantities[service.id] <= 1}
+                                          >
+                                            <Minus className="h-3 w-3" />
+                                          </Button>
+                                          <Input
+                                            type="number"
+                                            min="1"
+                                            max="10"
+                                            value={formData.serviceQuantities[service.id] || 1}
+                                            onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                            onFocus={(e) => e.target.select()}
+                                            className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
+                                          />
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                            onClick={() => incrementQuantity(service.id)}
+                                            disabled={formData.serviceQuantities[service.id] >= 10}
+                                          >
+                                            <Plus className="h-3 w-3" />
+                                          </Button>
+                                        </div>
                                       </div>
                                     )}
                                   </div>
@@ -437,15 +473,37 @@ export default function Home() {
                                           {service.id in formData.serviceQuantities && (
                                             <div className="flex items-center space-x-2">
                                               <Label className="text-xs text-[#000000]">Qty:</Label>
-                                              <Input
-                                                type="number"
-                                                min="1"
-                                                max="10"
-                                                value={formData.serviceQuantities[service.id] || 1}
-                                                onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                                onFocus={(e) => e.target.select()}
-                                                className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                              />
+                                              <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                                  onClick={() => decrementQuantity(service.id)}
+                                                  disabled={formData.serviceQuantities[service.id] <= 1}
+                                                >
+                                                  <Minus className="h-3 w-3" />
+                                                </Button>
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  max="10"
+                                                  value={formData.serviceQuantities[service.id] || 1}
+                                                  onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                                  onFocus={(e) => e.target.select()}
+                                                  className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
+                                                />
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                                  onClick={() => incrementQuantity(service.id)}
+                                                  disabled={formData.serviceQuantities[service.id] >= 10}
+                                                >
+                                                  <Plus className="h-3 w-3" />
+                                                </Button>
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -669,15 +727,37 @@ export default function Home() {
                                             {svc.id in formData.serviceQuantities && (
                                               <div className="flex items-center space-x-1">
                                                 <Label className="text-xs text-[#000000]">Qty:</Label>
-                                                <Input
-                                                  type="number"
-                                                  min="1"
-                                                  max="10"
-                                                  value={formData.serviceQuantities[svc.id] || 1}
-                                                  onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                onFocus={(e) => e.target.select()}
-                                                  className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                                />
+                                                <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                                  <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
+                                                    onClick={() => decrementQuantity(svc.id)}
+                                                    disabled={formData.serviceQuantities[svc.id] <= 1}
+                                                  >
+                                                    <Minus className="h-2 w-2" />
+                                                  </Button>
+                                                  <Input
+                                                    type="number"
+                                                    min="1"
+                                                    max="10"
+                                                    value={formData.serviceQuantities[svc.id] || 1}
+                                                    onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                    onFocus={(e) => e.target.select()}
+                                                    className="w-8 h-6 text-xs text-center border-0 focus:ring-0 focus:border-0"
+                                                  />
+                                                  <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
+                                                    onClick={() => incrementQuantity(svc.id)}
+                                                    disabled={formData.serviceQuantities[svc.id] >= 10}
+                                                  >
+                                                    <Plus className="h-2 w-2" />
+                                                  </Button>
+                                                </div>
                                               </div>
                                             )}
                                           </div>
@@ -845,15 +925,37 @@ export default function Home() {
                                           {svc.id in formData.serviceQuantities && (
                                             <div className="flex items-center space-x-1">
                                               <Label className="text-xs text-[#000000]">Qty:</Label>
-                                              <Input
-                                                type="number"
-                                                min="1"
-                                                max="10"
-                                                value={formData.serviceQuantities[svc.id] || 1}
-                                                onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                onFocus={(e) => e.target.select()}
-                                                className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                              />
+                                              <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
+                                                  onClick={() => decrementQuantity(svc.id)}
+                                                  disabled={formData.serviceQuantities[svc.id] <= 1}
+                                                >
+                                                  <Minus className="h-2 w-2" />
+                                                </Button>
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  max="10"
+                                                  value={formData.serviceQuantities[svc.id] || 1}
+                                                  onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
+                                                  onFocus={(e) => e.target.select()}
+                                                  className="w-8 h-6 text-xs text-center border-0 focus:ring-0 focus:border-0"
+                                                />
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
+                                                  onClick={() => incrementQuantity(svc.id)}
+                                                  disabled={formData.serviceQuantities[svc.id] >= 10}
+                                                >
+                                                  <Plus className="h-2 w-2" />
+                                                </Button>
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -1011,15 +1113,37 @@ export default function Home() {
                                 {service.id in formData.serviceQuantities && (
                                   <div className="flex items-center space-x-2">
                                     <Label className="text-xs text-[#14213D]">Qty:</Label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      max="10"
-                                      value={formData.serviceQuantities[service.id] || 1}
-                                      onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                      onFocus={(e) => e.target.select()}
-                                      className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                    />
+                                    <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                        onClick={() => decrementQuantity(service.id)}
+                                        disabled={formData.serviceQuantities[service.id] <= 1}
+                                      >
+                                        <Minus className="h-3 w-3" />
+                                      </Button>
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        value={formData.serviceQuantities[service.id] || 1}
+                                        onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                        onFocus={(e) => e.target.select()}
+                                        className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                        onClick={() => incrementQuantity(service.id)}
+                                        disabled={formData.serviceQuantities[service.id] >= 10}
+                                      >
+                                        <Plus className="h-3 w-3" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -1248,15 +1372,37 @@ export default function Home() {
                                 {service.id in formData.serviceQuantities && (
                                   <div className="flex items-center space-x-2">
                                     <Label className="text-xs text-[#14213D]">Qty:</Label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      max="10"
-                                      value={formData.serviceQuantities[service.id] || 1}
-                                      onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                      onFocus={(e) => e.target.select()}
-                                      className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
-                                    />
+                                    <div className="flex items-center border border-[#FCA311]/30 rounded-md">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                        onClick={() => decrementQuantity(service.id)}
+                                        disabled={formData.serviceQuantities[service.id] <= 1}
+                                      >
+                                        <Minus className="h-3 w-3" />
+                                      </Button>
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        value={formData.serviceQuantities[service.id] || 1}
+                                        onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                        onFocus={(e) => e.target.select()}
+                                        className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
+                                        onClick={() => incrementQuantity(service.id)}
+                                        disabled={formData.serviceQuantities[service.id] >= 10}
+                                      >
+                                        <Plus className="h-3 w-3" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 )}
                               </div>
