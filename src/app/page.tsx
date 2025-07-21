@@ -21,7 +21,7 @@ const topServices = [
     price: "$200",
     description: "Professional installation at any height. No risk, no hassle, just cool comfort.",
     icon: Fan,
-    iconColor: "from-[#BC6C25] to-[#DDA15E]"
+    iconColor: "from-[#FCA311] to-[#000000]"
   },
   {
     title: "Light Fixture & Pendant Swaps", 
@@ -29,7 +29,7 @@ const topServices = [
     price: "Starting at $150",
     description: "Transform your space instantly. From vanity lights to chandeliers, we do it all.",
     icon: Lightbulb,
-    iconColor: "from-[#DDA15E] to-[#BC6C25]"
+    iconColor: "from-[#000000] to-[#FCA311]"
   },
   {
     title: "Switches & Outlet Upgrades",
@@ -37,7 +37,7 @@ const topServices = [
     price: "Starting at $125", 
     description: "GFCI outlets, USB ports, smart switches, and dimmer installations for safety and convenience.",
     icon: Settings,
-    iconColor: "from-[#606C38] to-[#283618]"
+    iconColor: "from-[#14213D] to-[#000000]"
   }
 ];
 
@@ -107,9 +107,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFAE0]">
+    <div className="min-h-screen bg-[#E5E5E5]">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#283618] via-[#606C38] to-[#283618] py-24 px-4 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-[#000000] via-[#14213D] to-[#000000] py-24 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
@@ -119,14 +119,14 @@ export default function Home() {
                   STEWART FIXTURE CO.
                 </h1>
                 <div className="flex items-center justify-center lg:justify-start gap-2">
-                  <div className="flex text-[#DDA15E]">
+                  <div className="flex text-[#FCA311]">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current" />)}
                   </div>
                   <span className="text-white/90 text-lg font-medium">5-Star Local Service</span>
                 </div>
               </div>
               
-              <p className="text-2xl lg:text-3xl text-[#DDA15E] font-semibold mb-6 tracking-wide">
+              <p className="text-2xl lg:text-3xl text-[#FCA311] font-semibold mb-6 tracking-wide">
                 &ldquo;Fixtures. Fans. Finishes. Installed Right.&rdquo;
               </p>
               
@@ -137,85 +137,85 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button size="lg" className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <Button size="lg" className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
                       <Phone className="mr-2 h-5 w-5" />
                       Get Free Quote
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader className="text-center pb-4">
-                      <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
-                      <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
+                      <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Get Your Free Quote</DialogTitle>
+                      <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                       <div>
-                        <Label htmlFor="name" className="text-[#283618] font-semibold">Full Name</Label>
+                        <Label htmlFor="name" className="text-[#14213D] font-semibold">Full Name</Label>
                         <Input
                           id="name"
                           value={formData.name}
                           onChange={(e) => handleInputChange("name", e.target.value)}
-                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="Enter your full name"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="email" className="text-[#283618] font-semibold">Email Address</Label>
+                        <Label htmlFor="email" className="text-[#14213D] font-semibold">Email Address</Label>
                         <Input
                           id="email"
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange("email", e.target.value)}
-                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="your@email.com"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="phone" className="text-[#283618] font-semibold">Phone Number</Label>
+                        <Label htmlFor="phone" className="text-[#14213D] font-semibold">Phone Number</Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => handleInputChange("phone", e.target.value)}
-                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="(815) 555-0123"
                           required
                         />
                       </div>
                       <div>
-                        <Label className="text-[#283618] font-semibold">Services Needed</Label>
-                        <div className="mt-2 max-h-64 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                        <Label className="text-[#14213D] font-semibold">Services Needed</Label>
+                        <div className="mt-2 max-h-64 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
                           {getAllCategories().map(category => (
                             <div key={category} className="mb-6">
-                              <h4 className="font-semibold text-[#606C38] text-sm mb-3">{category}</h4>
+                              <h4 className="font-semibold text-[#14213D] text-sm mb-3">{category}</h4>
                               {getServicesByCategory(category).map(service => (
-                                <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-2">
+                                <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-2">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3 flex-1">
                                       <Checkbox
                                         id={service.id}
                                         checked={service.id in formData.serviceQuantities}
                                         onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                        className="border-[#DDA15E]/30"
+                                        className="border-[#FCA311]/30"
                                       />
                                       <Label 
                                         htmlFor={service.id}
-                                        className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                        className="text-sm text-[#000000] font-medium cursor-pointer"
                                       >
                                         {service.name}
                                       </Label>
                                     </div>
                                     {service.id in formData.serviceQuantities && (
                                       <div className="flex items-center space-x-2">
-                                        <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                        <Label className="text-xs text-[#000000]">Qty:</Label>
                                         <Input
                                           type="number"
                                           min="1"
                                           max="10"
                                           value={formData.serviceQuantities[service.id] || 1}
                                           onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                          className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                          className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                         />
                                       </div>
                                     )}
@@ -226,11 +226,11 @@ export default function Home() {
                           ))}
                         </div>
                         {getSelectedServices().length > 0 && (
-                          <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                          <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
                             <div className="flex justify-between items-center">
                               <div>
-                                <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
-                                <p className="text-xs text-[#606C38]">
+                                <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
+                                <p className="text-xs text-[#000000]">
                                   {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                                   {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
                                 </p>
@@ -238,11 +238,11 @@ export default function Home() {
                               <div className="text-right">
                                 {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
                                   <div>
-                                    <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
-                                    <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                    <p className="text-sm text-[#000000] line-through">${getCurrentTotal()}</p>
+                                    <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
                                   </div>
                                 ) : (
-                                  <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                  <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                                 )}
                               </div>
                             </div>
@@ -250,29 +250,29 @@ export default function Home() {
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="address" className="text-[#283618] font-semibold">Service Address</Label>
+                        <Label htmlFor="address" className="text-[#14213D] font-semibold">Service Address</Label>
                         <Input
                           id="address"
                           value={formData.address}
                           onChange={(e) => handleInputChange("address", e.target.value)}
-                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="message" className="text-[#283618] font-semibold">Additional Details</Label>
+                        <Label htmlFor="message" className="text-[#14213D] font-semibold">Additional Details</Label>
                         <Textarea
                           id="message"
                           value={formData.message}
                           onChange={(e) => handleInputChange("message", e.target.value)}
-                          className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1 resize-none"
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1 resize-none"
                           placeholder="Tell us more about your project..."
                           rows={3}
                         />
                       </div>
                       {showQuote && calculatedQuote !== null ? (
-                        <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                        <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
                           <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
                           <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
                           <p className="text-sm opacity-90">
@@ -287,7 +287,7 @@ export default function Home() {
                               setShowQuote(false);
                               setCalculatedQuote(null);
                             }}
-                            className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                            className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
                           >
                             Edit Services
                           </Button>
@@ -296,12 +296,12 @@ export default function Home() {
                         <Button 
                           type="submit" 
                           disabled={getSelectedServices().length === 0}
-                          className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Calculate My Quote
                         </Button>
                       )}
-                      <p className="text-center text-sm text-[#606C38] mt-3">
+                      <p className="text-center text-sm text-[#000000] mt-3">
                         {getSelectedServices().length === 0 ? "Please select at least one service" : "No obligation • Same-day response • Serving Middle TN"}
                       </p>
                     </form>
@@ -310,14 +310,14 @@ export default function Home() {
                 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="lg" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#DDA15E]/50 text-[#DDA15E] hover:bg-[#DDA15E]/10 backdrop-blur-sm">
+                    <Button variant="outline" size="lg" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#FCA311]/50 text-[#FCA311] hover:bg-[#FCA311]/10 backdrop-blur-sm">
                       View Services
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-6xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-6xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader className="text-center pb-4">
-                      <DialogTitle className="text-3xl font-bold text-[#283618] mb-2">Our Complete Service List</DialogTitle>
-                      <p className="text-[#606C38] text-lg">Professional installation with transparent flat-rate pricing</p>
+                      <DialogTitle className="text-3xl font-bold text-[#14213D] mb-2">Our Complete Service List</DialogTitle>
+                      <p className="text-[#000000] text-lg">Professional installation with transparent flat-rate pricing</p>
                     </DialogHeader>
                     <div className="grid gap-8 pt-4">
                       {Object.entries(
@@ -329,16 +329,16 @@ export default function Home() {
                           return acc;
                         }, {} as Record<string, typeof allServices>)
                       ).map(([category, services]) => (
-                        <div key={category} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-[#DDA15E]/20">
-                          <h3 className="text-xl font-bold text-[#283618] mb-4 border-b border-[#DDA15E]/30 pb-2">
+                        <div key={category} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-[#FCA311]/20">
+                          <h3 className="text-xl font-bold text-[#14213D] mb-4 border-b border-[#FCA311]/30 pb-2">
                             {category}
                           </h3>
                           <div className="grid gap-3">
                             {services.map((service, index) => (
-                              <div key={index} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 transition-colors">
-                                <div className="text-[#606C38] font-medium">{service.name}</div>
+                              <div key={index} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 transition-colors">
+                                <div className="text-[#000000] font-medium">{service.name}</div>
                                 {service.description && (
-                                  <div className="text-sm text-[#606C38]/70 mt-1">{service.description}</div>
+                                  <div className="text-sm text-[#000000]/70 mt-1">{service.description}</div>
                                 )}
                               </div>
                             ))}
@@ -346,103 +346,103 @@ export default function Home() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-6 pt-4 border-t border-[#DDA15E]/30 text-center">
-                      <p className="text-[#606C38] mb-4">Ready to get started?</p>
+                    <div className="mt-6 pt-4 border-t border-[#FCA311]/30 text-center">
+                      <p className="text-[#000000] mb-4">Ready to get started?</p>
                       {/* Avoid nested dialogs for better mobile UX. Consider closing this dialog before opening another. */}
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold">
+                          <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold">
                             <Phone className="mr-2 h-5 w-5" />
                             Get Free Quote
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#FEFAE0] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader className="text-center pb-4">
-                            <DialogTitle className="text-2xl font-bold text-[#283618] mb-2">Get Your Free Quote</DialogTitle>
-                            <p className="text-[#606C38] text-base">Professional installation with transparent flat-rate pricing</p>
+                            <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Get Your Free Quote</DialogTitle>
+                            <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                           </DialogHeader>
                           <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <Label htmlFor="services-name" className="text-[#283618] font-semibold">Full Name</Label>
+                                <Label htmlFor="services-name" className="text-[#14213D] font-semibold">Full Name</Label>
                                 <Input
                                   id="services-name"
                                   value={formData.name}
                                   onChange={(e) => handleInputChange("name", e.target.value)}
-                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="Enter your full name"
                                   required
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="services-email" className="text-[#283618] font-semibold">Email Address</Label>
+                                <Label htmlFor="services-email" className="text-[#14213D] font-semibold">Email Address</Label>
                                 <Input
                                   id="services-email"
                                   type="email"
                                   value={formData.email}
                                   onChange={(e) => handleInputChange("email", e.target.value)}
-                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="your@email.com"
                                   required
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="services-phone" className="text-[#283618] font-semibold">Phone Number</Label>
+                                <Label htmlFor="services-phone" className="text-[#14213D] font-semibold">Phone Number</Label>
                                 <Input
                                   id="services-phone"
                                   type="tel"
                                   value={formData.phone}
                                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="(815) 555-0123"
                                   required
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="services-address" className="text-[#283618] font-semibold">Service Address</Label>
+                                <Label htmlFor="services-address" className="text-[#14213D] font-semibold">Service Address</Label>
                                 <Input
                                   id="services-address"
                                   value={formData.address}
                                   onChange={(e) => handleInputChange("address", e.target.value)}
-                                  className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1"
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                                   required
                                 />
                               </div>
                             </div>
                             <div>
-                              <Label className="text-[#283618] font-semibold">Services Needed</Label>
-                              <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                              <Label className="text-[#14213D] font-semibold">Services Needed</Label>
+                              <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
                                 {getAllCategories().map(category => (
                                   <div key={category} className="mb-4">
-                                    <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                                    <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
                                     {getServicesByCategory(category).map(service => (
-                                      <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                                      <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center space-x-3 flex-1">
                                             <Checkbox
                                               id={`services-${service.id}`}
                                               checked={service.id in formData.serviceQuantities}
                                               onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                              className="border-[#DDA15E]/30"
+                                              className="border-[#FCA311]/30"
                                             />
                                             <Label 
                                               htmlFor={`services-${service.id}`}
-                                              className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                              className="text-sm text-[#000000] font-medium cursor-pointer"
                                             >
                                               {service.name}
                                             </Label>
                                           </div>
                                           {service.id in formData.serviceQuantities && (
                                             <div className="flex items-center space-x-2">
-                                              <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                              <Label className="text-xs text-[#000000]">Qty:</Label>
                                               <Input
                                                 type="number"
                                                 min="1"
                                                 max="10"
                                                 value={formData.serviceQuantities[service.id] || 1}
                                                 onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                                className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                                className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                               />
                                             </div>
                                           )}
@@ -453,11 +453,11 @@ export default function Home() {
                                 ))}
                               </div>
                               {getSelectedServices().length > 0 && (
-                                <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                                <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
                                   <div className="flex justify-between items-center">
                                     <div>
-                                      <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
-                                      <p className="text-xs text-[#606C38]">
+                                      <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
+                                      <p className="text-xs text-[#000000]">
                                         {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                                         {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
                                       </p>
@@ -465,11 +465,11 @@ export default function Home() {
                                     <div className="text-right">
                                       {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
                                         <div>
-                                          <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
-                                          <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                          <p className="text-sm text-[#000000] line-through">${getCurrentTotal()}</p>
+                                          <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
                                         </div>
                                       ) : (
-                                        <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                        <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                                       )}
                                     </div>
                                   </div>
@@ -477,20 +477,20 @@ export default function Home() {
                               )}
                             </div>
                             <div>
-                              <Label htmlFor="services-message" className="text-[#283618] font-semibold">Additional Details</Label>
+                              <Label htmlFor="services-message" className="text-[#14213D] font-semibold">Additional Details</Label>
                               <Textarea
                                 id="services-message"
                                 value={formData.message}
                                 onChange={(e) => handleInputChange("message", e.target.value)}
-                                className="border-[#DDA15E]/30 focus:border-[#BC6C25] focus:ring-[#BC6C25]/20 mt-1 resize-none"
+                                className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1 resize-none"
                                 placeholder="Tell us more about your project..."
                                 rows={3}
                               />
                             </div>
-                            <Button type="submit" className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] text-white py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
+                            <Button type="submit" className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
                               Get My Free Quote
                             </Button>
-                            <p className="text-center text-sm text-[#606C38] mt-3">
+                            <p className="text-center text-sm text-[#000000] mt-3">
                               No obligation • Same-day response • Serving Middle TN
                             </p>
                           </form>
@@ -538,18 +538,18 @@ export default function Home() {
       </section>
 
       {/* Service Areas */}
-      <section className="py-16 bg-gradient-to-b from-[#FEFAE0] to-white">
+      <section className="py-16 bg-gradient-to-b from-[#E5E5E5] to-white">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-[#283618] mb-4">Serving Tennessee Communities</h2>
-            <div className="flex items-center justify-center gap-2 text-[#606C38]">
+            <h2 className="text-4xl font-bold text-[#14213D] mb-4">Serving Tennessee Communities</h2>
+            <div className="flex items-center justify-center gap-2 text-[#000000]">
               <MapPin className="h-5 w-5" />
               <span>Proudly serving</span>
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             {serviceAreas.map((area, index) => (
-              <Badge key={index} variant="secondary" className="text-lg py-3 px-6 bg-[#606C38] text-white hover:bg-[#283618] border-0 rounded-xl font-semibold">
+              <Badge key={index} variant="secondary" className="text-lg py-3 px-6 bg-[#14213D] text-white hover:bg-[#000000] border-0 rounded-xl font-semibold">
                 {area}, TN
               </Badge>
             ))}
@@ -561,10 +561,10 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-[#283618] mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-[#14213D] mb-6">
               Our Most Popular Services
             </h2>
-            <p className="text-xl text-[#606C38] max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-[#000000] max-w-3xl mx-auto leading-relaxed">
               Professional installation, transparent pricing, same-day service.
             </p>
           </div>
@@ -580,20 +580,20 @@ export default function Home() {
                       <div className={`inline-flex p-5 rounded-3xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-xl mx-auto`}>
                         <IconComponent className="h-12 w-12 text-white" />
                       </div>
-                      <h2 className="text-xl font-bold text-[#BC6C25] mb-4 uppercase tracking-wide">
+                      <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
                         {service.title}
                       </h2>
-                      <h3 className="text-2xl font-bold text-[#283618] mb-4 leading-tight">
+                      <h3 className="text-2xl font-bold text-[#14213D] mb-4 leading-tight">
                         {service.headline}
                       </h3>
-                      <p className="text-base text-[#606C38] mb-6 leading-relaxed">
+                      <p className="text-base text-[#000000] mb-6 leading-relaxed">
                         {service.description}
                       </p>
                       <div className="flex flex-col items-center gap-4 mt-auto">
-                        <div className="text-4xl font-bold text-[#BC6C25]">{service.price}</div>
+                        <div className="text-4xl font-bold text-[#FCA311]">{service.price}</div>
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold w-full">
+                            <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
                               Get Quote
                             </Button>
                           </DialogTrigger>
@@ -642,11 +642,11 @@ export default function Home() {
                                 />
                               </div>
                               <div>
-                                <Label className="text-[#283618] font-semibold">Services Needed</Label>
-                                <div className="mt-2 max-h-32 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-3 bg-white">
+                                <Label className="text-[#14213D] font-semibold">Services Needed</Label>
+                                <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
                                   {getAllCategories().map(category => (
                                     <div key={category} className="mb-3">
-                                      <h4 className="font-semibold text-[#606C38] text-xs mb-1">{category}</h4>
+                                      <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
                                       {getServicesByCategory(category).map(svc => (
                                         <div key={svc.id} className="mb-1">
                                           <div className="flex items-center justify-between">
@@ -655,25 +655,25 @@ export default function Home() {
                                                 id={`desktop-${index}-${svc.id}`}
                                                 checked={svc.id in formData.serviceQuantities}
                                                 onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
-                                                className="border-[#DDA15E]/30"
+                                                className="border-[#FCA311]/30"
                                               />
                                               <Label 
                                                 htmlFor={`desktop-${index}-${svc.id}`}
-                                                className="text-xs text-[#606C38] font-medium cursor-pointer"
+                                                className="text-xs text-[#000000] font-medium cursor-pointer"
                                               >
                                                 {svc.name}
                                               </Label>
                                             </div>
                                             {svc.id in formData.serviceQuantities && (
                                               <div className="flex items-center space-x-1">
-                                                <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                                <Label className="text-xs text-[#000000]">Qty:</Label>
                                                 <Input
                                                   type="number"
                                                   min="1"
                                                   max="10"
                                                   value={formData.serviceQuantities[svc.id] || 1}
                                                   onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                  className="w-12 h-6 text-xs text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                                  className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                                 />
                                               </div>
                                             )}
@@ -684,15 +684,15 @@ export default function Home() {
                                   ))}
                                 </div>
                                 {getSelectedServices().length > 0 && (
-                                  <div className="mt-3 p-3 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-lg border border-[#DDA15E]/30">
+                                  <div className="mt-3 p-3 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-lg border border-[#FCA311]/30">
                                     <div className="flex justify-between items-center">
                                       <div>
-                                        <p className="text-xs font-semibold text-[#283618]">Total:</p>
-                                        <p className="text-xs text-[#606C38]">
+                                        <p className="text-xs font-semibold text-[#14213D]">Total:</p>
+                                        <p className="text-xs text-[#000000]">
                                           {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                                         </p>
                                       </div>
-                                      <p className="text-lg font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                      <p className="text-lg font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                                     </div>
                                   </div>
                                 )}
@@ -708,7 +708,7 @@ export default function Home() {
                                 />
                               </div>
                               {showQuote && calculatedQuote !== null ? (
-                                <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-4 text-center text-white">
+                                <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-4 text-center text-[#14213D]">
                                   <h3 className="text-lg font-bold mb-1">Your Quote</h3>
                                   <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
                                   <p className="text-xs opacity-90">
@@ -720,7 +720,7 @@ export default function Home() {
                                       setShowQuote(false);
                                       setCalculatedQuote(null);
                                     }}
-                                    className="mt-2 bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs py-1"
+                                    className="mt-2 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30 text-xs py-1"
                                   >
                                     Edit Services
                                   </Button>
@@ -729,7 +729,7 @@ export default function Home() {
                                 <Button 
                                   type="submit" 
                                   disabled={getSelectedServices().length === 0}
-                                  className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50"
+                                  className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50"
                                 >
                                   Calculate Quote
                                 </Button>
@@ -755,20 +755,20 @@ export default function Home() {
                     <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.iconColor} mb-6 shadow-lg`}>
                       <IconComponent className="h-12 w-12 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-[#BC6C25] mb-4 uppercase tracking-wide">
+                    <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
                       {service.title}
                     </h2>
-                    <h3 className="text-2xl font-bold text-[#283618] mb-4 leading-tight">
+                    <h3 className="text-2xl font-bold text-[#14213D] mb-4 leading-tight">
                       {service.headline}
                     </h3>
-                    <p className="text-base text-[#606C38] mb-6 leading-relaxed">
+                    <p className="text-base text-[#000000] mb-6 leading-relaxed">
                       {service.description}
                     </p>
                     <div className="flex flex-col items-center gap-4">
-                      <div className="text-3xl font-bold text-[#BC6C25]">{service.price}</div>
+                      <div className="text-3xl font-bold text-[#FCA311]">{service.price}</div>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="bg-[#BC6C25] hover:bg-[#DDA15E] text-white px-8 py-3 rounded-xl font-semibold w-full">
+                          <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
                             Get Quote
                           </Button>
                         </DialogTrigger>
@@ -817,11 +817,11 @@ export default function Home() {
                               />
                             </div>
                             <div>
-                              <Label className="text-[#283618] font-semibold">Services Needed</Label>
-                              <div className="mt-2 max-h-32 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-3 bg-white">
+                              <Label className="text-[#14213D] font-semibold">Services Needed</Label>
+                              <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
                                 {getAllCategories().map(category => (
                                   <div key={category} className="mb-3">
-                                    <h4 className="font-semibold text-[#606C38] text-xs mb-1">{category}</h4>
+                                    <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
                                     {getServicesByCategory(category).map(svc => (
                                       <div key={svc.id} className="mb-1">
                                         <div className="flex items-center justify-between">
@@ -830,25 +830,25 @@ export default function Home() {
                                               id={`mobile-${index}-${svc.id}`}
                                               checked={svc.id in formData.serviceQuantities}
                                               onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
-                                              className="border-[#DDA15E]/30"
+                                              className="border-[#FCA311]/30"
                                             />
                                             <Label 
                                               htmlFor={`mobile-${index}-${svc.id}`}
-                                              className="text-xs text-[#606C38] font-medium cursor-pointer"
+                                              className="text-xs text-[#000000] font-medium cursor-pointer"
                                             >
                                               {svc.name}
                                             </Label>
                                           </div>
                                           {svc.id in formData.serviceQuantities && (
                                             <div className="flex items-center space-x-1">
-                                              <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                              <Label className="text-xs text-[#000000]">Qty:</Label>
                                               <Input
                                                 type="number"
                                                 min="1"
                                                 max="10"
                                                 value={formData.serviceQuantities[svc.id] || 1}
                                                 onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                className="w-12 h-6 text-xs text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                                className="w-12 h-6 text-xs text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                               />
                                             </div>
                                           )}
@@ -859,15 +859,15 @@ export default function Home() {
                                 ))}
                               </div>
                               {getSelectedServices().length > 0 && (
-                                <div className="mt-3 p-3 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-lg border border-[#DDA15E]/30">
+                                <div className="mt-3 p-3 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-lg border border-[#FCA311]/30">
                                   <div className="flex justify-between items-center">
                                     <div>
-                                      <p className="text-xs font-semibold text-[#283618]">Total:</p>
-                                      <p className="text-xs text-[#606C38]">
+                                      <p className="text-xs font-semibold text-[#14213D]">Total:</p>
+                                      <p className="text-xs text-[#000000]">
                                         {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                                       </p>
                                     </div>
-                                    <p className="text-lg font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                                    <p className="text-lg font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                                   </div>
                                 </div>
                               )}
@@ -883,7 +883,7 @@ export default function Home() {
                               />
                             </div>
                             {showQuote && calculatedQuote !== null ? (
-                              <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-4 text-center text-white">
+                              <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-4 text-center text-[#14213D]">
                                 <h3 className="text-lg font-bold mb-1">Your Quote</h3>
                                 <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
                                 <p className="text-xs opacity-90">
@@ -895,7 +895,7 @@ export default function Home() {
                                     setShowQuote(false);
                                     setCalculatedQuote(null);
                                   }}
-                                  className="mt-2 bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs py-1"
+                                  className="mt-2 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30 text-xs py-1"
                                 >
                                   Edit Services
                                 </Button>
@@ -904,7 +904,7 @@ export default function Home() {
                               <Button 
                                 type="submit" 
                                 disabled={getSelectedServices().length === 0}
-                                className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50"
+                                className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50"
                               >
                                 Calculate Quote
                               </Button>
@@ -922,7 +922,7 @@ export default function Home() {
       </section>
 
       {/* Bundle CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-[#BC6C25] to-[#DDA15E]">
+      <section className="py-16 bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -933,7 +933,7 @@ export default function Home() {
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" className="bg-white text-[#BC6C25] hover:bg-white/90 px-10 py-4 text-lg font-semibold rounded-xl">
+                <Button size="lg" className="bg-white text-[#FCA311] hover:bg-white/90 px-10 py-4 text-lg font-semibold rounded-xl">
                   Get Bundle Quote
                 </Button>
               </DialogTrigger>
@@ -982,38 +982,38 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <Label className="text-[#283618] font-semibold">Services to Bundle (Need 3+ total services for 10% discount)</Label>
-                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                    <Label className="text-[#14213D] font-semibold">Services to Bundle (Need 3+ total services for 10% discount)</Label>
+                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
                       {getAllCategories().map(category => (
                         <div key={category} className="mb-4">
-                          <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                          <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
                           {getServicesByCategory(category).map(service => (
-                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3 flex-1">
                                   <Checkbox
                                     id={`bundle-${service.id}`}
                                     checked={service.id in formData.serviceQuantities}
                                     onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                    className="border-[#DDA15E]/30"
+                                    className="border-[#FCA311]/30"
                                   />
                                   <Label 
                                     htmlFor={`bundle-${service.id}`}
-                                    className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                    className="text-sm text-[#14213D] font-medium cursor-pointer"
                                   >
                                     {service.name}
                                   </Label>
                                 </div>
                                 {service.id in formData.serviceQuantities && (
                                   <div className="flex items-center space-x-2">
-                                    <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                    <Label className="text-xs text-[#14213D]">Qty:</Label>
                                     <Input
                                       type="number"
                                       min="1"
                                       max="10"
                                       value={formData.serviceQuantities[service.id] || 1}
                                       onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                      className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                      className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                     />
                                   </div>
                                 )}
@@ -1024,11 +1024,11 @@ export default function Home() {
                       ))}
                     </div>
                     {getSelectedServices().length > 0 && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                      <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-sm font-semibold text-[#283618]">Bundle Total:</p>
-                            <p className="text-xs text-[#606C38]">
+                            <p className="text-sm font-semibold text-[#14213D]">Bundle Total:</p>
+                            <p className="text-xs text-[#14213D]">
                               {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                               {getTotalServiceCount() >= 3 ? " • 10% Bundle Discount Applied!" : " • Need 3+ for 10% off"}
                             </p>
@@ -1036,11 +1036,11 @@ export default function Home() {
                           <div className="text-right">
                             {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
                               <div>
-                                <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
-                                <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                <p className="text-sm text-[#14213D] line-through">${getCurrentTotal()}</p>
+                                <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
                               </div>
                             ) : (
-                              <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                              <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                             )}
                           </div>
                         </div>
@@ -1058,7 +1058,7 @@ export default function Home() {
                     />
                   </div>
                   {showQuote && calculatedQuote !== null ? (
-                    <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                    <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
                       <h3 className="text-2xl font-bold mb-2">Your Bundle Quote</h3>
                       <div className="text-4xl font-bold mb-2">
                         ${getTotalServiceCount() >= 3 ? Math.round(calculatedQuote * 0.9) : calculatedQuote}
@@ -1081,7 +1081,7 @@ export default function Home() {
                           setShowQuote(false);
                           setCalculatedQuote(null);
                         }}
-                        className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                        className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
                       >
                         Edit Services
                       </Button>
@@ -1090,7 +1090,7 @@ export default function Home() {
                     <Button 
                       type="submit" 
                       disabled={getSelectedServices().length === 0}
-                      className="w-full bg-[#BC6C25] hover:bg-[#DDA15E] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {getTotalServiceCount() >= 3 ? 'Calculate Bundle Quote (10% Off!)' : 'Calculate Quote'}
                     </Button>
@@ -1103,12 +1103,12 @@ export default function Home() {
       </section>
 
       {/* Additional Services */}
-      <section className="py-16 bg-[#FEFAE0]">
+      <section className="py-16 bg-[#E5E5E5]">
         <div className="container mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-[#283618] mb-6">
+          <h2 className="text-3xl lg:text-4xl font-bold text-[#14213D] mb-6">
             We Also Handle
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[#606C38] font-medium">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[#000000] font-medium">
             <div>Smart Home Devices</div>
             <div>TV Mounting</div>
             <div>Cabinet Hardware</div>
@@ -1118,17 +1118,17 @@ export default function Home() {
             <div>Smoke Detectors</div>
             <div>Motion Sensors</div>
           </div>
-          <p className="text-lg text-[#606C38] mt-8 max-w-2xl mx-auto">
+          <p className="text-lg text-[#000000] mt-8 max-w-2xl mx-auto">
             From quick 30-minute fixes to full home upgrades — if it involves fixtures, switches, or hardware, we&apos;ve got you covered.
           </p>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-[#FEFAE0]">
+      <section className="py-20 bg-[#E5E5E5]">
         <div className="container mx-auto max-w-4xl px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-bold text-[#283618] mb-8">
+            <h2 className="text-4xl lg:text-5xl font-bold text-[#14213D] mb-8">
               Frequently Asked Questions
             </h2>
           </div>
@@ -1166,19 +1166,19 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-[#283618] via-[#606C38] to-[#283618] text-white relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-[#14213D] via-[#000000] to-[#14213D] text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto max-w-4xl px-4 text-center relative z-10">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-xl mb-10 text-blue-100 leading-relaxed">
+          <p className="text-xl mb-10 text-white/90 leading-relaxed">
             Join hundreds of satisfied customers across Middle Tennessee
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" variant="secondary" className="px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-[#BC6C25] hover:bg-[#DDA15E] text-white border-0">
+                <Button size="lg" variant="secondary" className="px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-[#FCA311] hover:bg-[#FCA311]/80 text-white border-0">
                   <Phone className="mr-2 h-5 w-5" />
                   Schedule Service Now
                 </Button>
@@ -1218,38 +1218,38 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <Label className="text-[#283618] font-semibold">Services Needed (Select All That Apply)</Label>
-                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#DDA15E]/30 rounded-md p-4 bg-white">
+                    <Label className="text-[#14213D] font-semibold">Services Needed (Select All That Apply)</Label>
+                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
                       {getAllCategories().map(category => (
                         <div key={category} className="mb-4">
-                          <h4 className="font-semibold text-[#606C38] text-sm mb-2">{category}</h4>
+                          <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
                           {getServicesByCategory(category).map(service => (
-                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#DDA15E]/10 mb-1">
+                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3 flex-1">
                                   <Checkbox
                                     id={`footer-${service.id}`}
                                     checked={service.id in formData.serviceQuantities}
                                     onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                    className="border-[#DDA15E]/30"
+                                    className="border-[#FCA311]/30"
                                   />
                                   <Label 
                                     htmlFor={`footer-${service.id}`}
-                                    className="text-sm text-[#606C38] font-medium cursor-pointer"
+                                    className="text-sm text-[#14213D] font-medium cursor-pointer"
                                   >
                                     {service.name}
                                   </Label>
                                 </div>
                                 {service.id in formData.serviceQuantities && (
                                   <div className="flex items-center space-x-2">
-                                    <Label className="text-xs text-[#606C38]">Qty:</Label>
+                                    <Label className="text-xs text-[#14213D]">Qty:</Label>
                                     <Input
                                       type="number"
                                       min="1"
                                       max="10"
                                       value={formData.serviceQuantities[service.id] || 1}
                                       onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                      className="w-16 h-8 text-center border-[#DDA15E]/30 focus:border-[#BC6C25]"
+                                      className="w-16 h-8 text-center border-[#FCA311]/30 focus:border-[#FCA311]"
                                     />
                                   </div>
                                 )}
@@ -1260,11 +1260,11 @@ export default function Home() {
                       ))}
                     </div>
                     {getSelectedServices().length > 0 && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-[#BC6C25]/10 to-[#DDA15E]/10 rounded-xl border border-[#DDA15E]/30">
+                      <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-sm font-semibold text-[#283618]">Current Total:</p>
-                            <p className="text-xs text-[#606C38]">
+                            <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
+                            <p className="text-xs text-[#14213D]">
                               {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
                               {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
                             </p>
@@ -1272,11 +1272,11 @@ export default function Home() {
                           <div className="text-right">
                             {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
                               <div>
-                                <p className="text-sm text-[#606C38] line-through">${getCurrentTotal()}</p>
-                                <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotalWithDiscount()}</p>
+                                <p className="text-sm text-[#14213D] line-through">${getCurrentTotal()}</p>
+                                <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
                               </div>
                             ) : (
-                              <p className="text-2xl font-bold text-[#BC6C25]">${getCurrentTotal()}</p>
+                              <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
                             )}
                           </div>
                         </div>
@@ -1304,7 +1304,7 @@ export default function Home() {
                     />
                   </div>
                   {showQuote && calculatedQuote !== null ? (
-                    <div className="bg-gradient-to-r from-[#BC6C25] to-[#DDA15E] rounded-xl p-6 text-center text-white mb-4">
+                    <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
                       <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
                       <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
                       <p className="text-sm opacity-90">
@@ -1319,7 +1319,7 @@ export default function Home() {
                           setShowQuote(false);
                           setCalculatedQuote(null);
                         }}
-                        className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                        className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
                       >
                         Edit Services
                       </Button>
@@ -1337,7 +1337,7 @@ export default function Home() {
               </DialogContent>
             </Dialog>
             
-            <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#DDA15E]/50 text-[#DDA15E] hover:bg-[#DDA15E]/10 backdrop-blur-sm">
+            <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#FCA311]/50 text-[#FCA311] hover:bg-[#FCA311]/10 backdrop-blur-sm">
               <Mail className="mr-2 h-5 w-5" />
               Email Us
             </Button>
@@ -1346,7 +1346,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#283618] text-white py-16">
+      <footer className="bg-[#14213D] text-white py-16">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -1360,14 +1360,14 @@ export default function Home() {
                 />
                 <h3 className="text-2xl font-bold tracking-wider">STEWART FIXTURE CO.</h3>
               </div>
-              <p className="text-[#FEFAE0]/70 leading-relaxed">
+              <p className="text-[#E5E5E5]/70 leading-relaxed">
                 Professional fixture installation services across Middle Tennessee.
               </p>
             </div>
             
             <div>
               <h4 className="text-xl font-bold mb-4">Service Areas</h4>
-              <ul className="text-[#FEFAE0]/70 space-y-2">
+              <ul className="text-[#E5E5E5]/70 space-y-2">
                 {serviceAreas.map((area, index) => (
                   <li key={index}>{area}, TN</li>
                 ))}
@@ -1376,7 +1376,7 @@ export default function Home() {
             
             <div>
               <h4 className="text-xl font-bold mb-4">Contact</h4>
-              <div className="text-[#FEFAE0]/70 space-y-3">
+              <div className="text-[#E5E5E5]/70 space-y-3">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
                   <span>(815) 577-6393</span>
@@ -1389,7 +1389,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="border-t border-[#606C38] mt-12 pt-8 text-center text-[#FEFAE0]/70">
+          <div className="border-t border-[#14213D] mt-12 pt-8 text-center text-[#E5E5E5]/70">
             <p>&copy; 2024 STEWART FIXTURE CO. All rights reserved.</p>
           </div>
         </div>
