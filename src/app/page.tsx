@@ -131,7 +131,7 @@ export default function Home() {
               <div className="mb-8">
                 <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
                   <Image
-                    src="/icon_w_name.svg"
+                    src="/icon_w_name_v2.svg"
                     alt="Stewart Services Logo"
                     width={300}
                     height={120}
@@ -1529,7 +1529,7 @@ export default function Home() {
             <div>
               <div className="mb-4">
                 <Image
-                  src="/icon_w_name.svg"
+                  src="/icon_w_name_v2.svg"
                   alt="Stewart Services Logo"
                   width={200}
                   height={60}
