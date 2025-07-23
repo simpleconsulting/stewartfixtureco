@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: 'Stewart Services',
     images: [
       {
-        url: '/icon_w_name_v3.svg',
+        url: '/icon_w_name.svg',
         width: 347,
         height: 96,
         alt: 'Stewart Services Logo',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Stewart Services | Professional Fixture Installation',
     description: 'Professional installation of light fixtures, ceiling fans, switches, outlets, and home hardware across Middle Tennessee.',
-    images: ['/icon_w_name_v3.svg'],
+    images: ['/icon_w_name.svg'],
   },
 };
 
