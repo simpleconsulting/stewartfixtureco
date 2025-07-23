@@ -129,9 +129,15 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left relative z-10">
               <div className="mb-8">
-                <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight tracking-wider mb-4">
-                  STEWART SERVICES
-                </h1>
+                <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
+                  <Image
+                    src="/icon_w_name.svg"
+                    alt="Stewart Services Logo"
+                    width={300}
+                    height={120}
+                    className="w-auto h-24 lg:h-32 filter brightness-0 invert"
+                  />
+                </div>
                 <div className="flex items-center justify-center lg:justify-start gap-2">
                   <div className="flex text-[#FCA311]">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current" />)}
@@ -1521,15 +1527,14 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4">
                 <Image
-                  src="/icon.svg"
+                  src="/icon_w_name.svg"
                   alt="Stewart Services Logo"
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 filter brightness-0 invert"
+                  width={200}
+                  height={60}
+                  className="w-auto h-12 filter brightness-0 invert"
                 />
-                <h3 className="text-2xl font-bold tracking-wider">STEWART SERVICES</h3>
               </div>
               <p className="text-[#E5E5E5]/70 leading-relaxed">
                 Professional fixture installation services across Middle Tennessee.
