@@ -52,7 +52,8 @@ export default function Home() {
     phone: "",
     serviceQuantities: {} as Record<string, number>,
     address: "",
-    message: ""
+    message: "",
+    discountCode: ""
   });
   
   const [calculatedQuote, setCalculatedQuote] = useState<number | null>(null);
@@ -109,12 +110,39 @@ export default function Home() {
   const getCurrentTotalWithDiscount = () => {
     const total = getCurrentTotal();
     const serviceCount = getTotalServiceCount();
-    return serviceCount >= 3 ? Math.round(total * 0.9) : total;
+    if (serviceCount >= 5) {
+      return Math.round(total * 0.8); // 20% off for 5+ services
+    } else if (serviceCount >= 3) {
+      return Math.round(total * 0.9); // 10% off for 3+ services
+    }
+    return total;
+  };
+
+  const applyDiscountCode = (total: number, discountCode: string) => {
+    const code = discountCode.toUpperCase().trim();
+    if (code === 'FIRST20') {
+      return Math.round(total * 0.8); // 20% off
+    }
+    return total;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const quote = calculateTotal(formData.serviceQuantities);
+    let quote = calculateTotal(formData.serviceQuantities);
+    
+    // Apply bundle discount first if applicable
+    const serviceCount = getTotalServiceCount();
+    if (serviceCount >= 5) {
+      quote = Math.round(quote * 0.8); // 20% off for 5+ services
+    } else if (serviceCount >= 3) {
+      quote = Math.round(quote * 0.9); // 10% off for 3+ services
+    }
+    
+    // Apply discount code if provided
+    if (formData.discountCode) {
+      quote = applyDiscountCode(quote, formData.discountCode);
+    }
+    
     setCalculatedQuote(quote);
     setShowQuote(true);
     console.log("Form submitted:", formData, "Quote:", quote);
@@ -158,8 +186,7 @@ export default function Home() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button size="lg" className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
-                      <Phone className="mr-2 h-5 w-5" />
-                      Get Free Quote
+                      Free Instant Quote
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -268,24 +295,31 @@ export default function Home() {
                             </div>
                           ))}
                         </div>
-                        {getSelectedServices().length > 0 && (
-                          <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
+                        {getSelectedServices().length > 0 && !showQuote && (
+                          <div className={`mt-4 p-4 rounded-xl border ${getTotalServiceCount() >= 5 ? 'bg-gradient-to-r from-purple-100 to-purple-200 border-purple-300' : getTotalServiceCount() === 4 ? 'bg-gradient-to-r from-red-100 to-red-200 border-red-400' : getTotalServiceCount() === 3 ? 'bg-gradient-to-r from-green-100 to-green-200 border-green-300' : getTotalServiceCount() === 2 ? 'bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300' : 'bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 border-[#FCA311]/30'}`}>
                             <div className="flex justify-between items-center">
                               <div>
-                                <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
+                                <p className="text-sm font-semibold text-[#14213D]">Services Selected:</p>
                                 <p className="text-xs text-[#000000]">
                                   {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                                  {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
+                                  {getTotalServiceCount() >= 5 && " • 20% MEGA Bundle Discount Applied! 🚀"}
+                                  {getTotalServiceCount() === 4 && " • Add 1 more service for 20% off everything! 🚀"}
+                                  {getTotalServiceCount() === 3 && " • 10% Bundle Discount! Add 2 more for 20% off! 🎉"}
+                                  {getTotalServiceCount() === 2 && " • Add 1 more service for 10% off everything! 💰"}
+                                  {getTotalServiceCount() === 1 && " • Add 2 more services for 10% off everything!"}
                                 </p>
                               </div>
                               <div className="text-right">
-                                {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
-                                  <div>
-                                    <p className="text-sm text-[#000000] line-through">${getCurrentTotal()}</p>
-                                    <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
-                                  </div>
+                                {getTotalServiceCount() >= 5 ? (
+                                  <p className="text-lg font-semibold text-purple-700">MEGA Discount!</p>
+                                ) : getTotalServiceCount() === 4 ? (
+                                  <p className="text-lg font-semibold text-red-700 animate-pulse">Almost MEGA!</p>
+                                ) : getTotalServiceCount() === 3 ? (
+                                  <p className="text-lg font-semibold text-green-700">Bundle Discount!</p>
+                                ) : getTotalServiceCount() === 2 ? (
+                                  <p className="text-lg font-semibold text-amber-700">Almost There!</p>
                                 ) : (
-                                  <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
+                                  <p className="text-lg font-semibold text-[#14213D]">Submit for Quote</p>
                                 )}
                               </div>
                             </div>
@@ -301,6 +335,16 @@ export default function Home() {
                           className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                           required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="discountCode" className="text-[#14213D] font-semibold">Discount Code (Optional)</Label>
+                        <Input
+                          id="discountCode"
+                          value={formData.discountCode}
+                          onChange={(e) => handleInputChange("discountCode", e.target.value)}
+                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                          placeholder="Enter discount code"
                         />
                       </div>
                       <div>
@@ -320,6 +364,9 @@ export default function Home() {
                           <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
                           <p className="text-sm opacity-90">
                             {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
+                            {getTotalServiceCount() >= 5 && " • 20% MEGA Bundle discount applied!"}
+                            {getTotalServiceCount() >= 3 && getTotalServiceCount() < 5 && " • 10% Bundle discount applied!"}
+                            {formData.discountCode && formData.discountCode.toUpperCase().trim() === 'FIRST20' && " • Discount code applied!"}
                           </p>
                           <p className="text-sm opacity-90 mt-1">
                             No hidden fees • Flat-rate pricing • Same-day response
@@ -396,7 +443,7 @@ export default function Home() {
                         <DialogTrigger asChild>
                           <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold">
                             <Phone className="mr-2 h-5 w-5" />
-                            Get Free Quote
+                            Book Service
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -554,7 +601,7 @@ export default function Home() {
                               />
                             </div>
                             <Button type="submit" className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
-                              Get My Free Quote
+                              Book Service
                             </Button>
                             <p className="text-center text-sm text-[#000000] mt-3">
                               No obligation • Same-day response • Serving Middle TN
@@ -665,40 +712,47 @@ export default function Home() {
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
-                              Get Quote
+                              Book Service
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Schedule Your {service.title}</DialogTitle>
+                          <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader className="text-center pb-4">
+                              <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Schedule Your {service.title}</DialogTitle>
+                              <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                             </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                               <div>
-                                <Label htmlFor={`desktop-name-${index}`}>Full Name</Label>
+                                <Label htmlFor={`desktop-name-${index}`} className="text-[#14213D] font-semibold">Full Name</Label>
                                 <Input
                                   id={`desktop-name-${index}`}
                                   value={formData.name}
                                   onChange={(e) => handleInputChange("name", e.target.value)}
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                                  placeholder="Enter your full name"
                                   required
                                 />
                               </div>
                               <div>
-                                <Label htmlFor={`desktop-email-${index}`}>Email</Label>
+                                <Label htmlFor={`desktop-email-${index}`} className="text-[#14213D] font-semibold">Email Address</Label>
                                 <Input
                                   id={`desktop-email-${index}`}
                                   type="email"
                                   value={formData.email}
                                   onChange={(e) => handleInputChange("email", e.target.value)}
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                                  placeholder="your@email.com"
                                   required
                                 />
                               </div>
                               <div>
-                                <Label htmlFor={`desktop-phone-${index}`}>Phone Number</Label>
+                                <Label htmlFor={`desktop-phone-${index}`} className="text-[#14213D] font-semibold">Phone Number</Label>
                                 <Input
                                   id={`desktop-phone-${index}`}
                                   type="tel"
                                   value={formData.phone}
                                   onChange={(e) => handleInputChange("phone", e.target.value)}
+                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                                  placeholder="(815) 555-0123"
                                   required
                                 />
                               </div>
@@ -868,14 +922,15 @@ export default function Home() {
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
-                            Get Quote
+                            Book Service
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Schedule Your {service.title}</DialogTitle>
+                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader className="text-center pb-4">
+                            <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Schedule Your {service.title}</DialogTitle>
+                            <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                           </DialogHeader>
-                          <form onSubmit={handleSubmit} className="space-y-4">
+                          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                             <div>
                               <Label htmlFor={`mobile-name-${index}`}>Full Name</Label>
                               <Input
@@ -1048,22 +1103,23 @@ export default function Home() {
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-              Bundle & Save 10%
+              Bundle & Save Up to 20%
             </h2>
             <p className="text-xl text-white/90 mb-6">
-              Book 3+ services and save money while upgrading your entire home.
+              Save 10% on 3+ services or 20% on 5+ services while upgrading your entire home.
             </p>
             <Dialog>
               <DialogTrigger asChild>
                 <Button size="lg" className="bg-white text-[#FCA311] hover:bg-white/90 px-10 py-4 text-lg font-semibold rounded-xl">
-                  Get Bundle Quote
+                  Book Bundle Service
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Bundle Services & Save 10%</DialogTitle>
+              <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="text-center pb-4">
+                  <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Bundle Services & Save Up to 20%</DialogTitle>
+                  <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-5 pt-2">
                   <div>
                     <Label htmlFor="bundle-name">Full Name</Label>
                     <Input
@@ -1268,7 +1324,7 @@ export default function Home() {
             <div>Smoke Detectors</div>
             <div>Motion Sensors</div>
             <div>Quick Fixes</div>
-            <div>Bundle Services</div>
+            <div>Smart Switches</div>
             <div>GFCI Outlets</div>
             <div>3-Way Switches</div>
           </div>

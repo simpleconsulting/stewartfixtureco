@@ -122,22 +122,6 @@ export const pricingMatrix: ServiceItem[] = [
     price: 95,
     description: "Minor repair or installation"
   },
-  
-  // Service Bundles
-  {
-    id: "bundle-3-fixtures",
-    category: "Service Bundles",
-    name: "Bundle: 3 Electrical Fixtures (Mix & Match)",
-    price: 375,
-    description: "Save on multiple fixture installations"
-  },
-  {
-    id: "bundle-5-switches-outlets",
-    category: "Service Bundles",
-    name: "Bundle: 5 Switches or Outlets",
-    price: 450,
-    description: "Save on multiple switch/outlet upgrades"
-  }
 ];
 
 // Helper functions for pricing calculations
