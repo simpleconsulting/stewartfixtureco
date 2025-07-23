@@ -41,7 +41,7 @@ const topServices = [
   }
 ];
 
-const serviceAreas = ["Spring Hill", "Thompson's Station", "Columbia"];
+const serviceAreas = ["Spring Hill", "Franklin", "Thompson's Station", "Columbia"];
 
 const allServices = pricingMatrix;
 
@@ -1574,9 +1574,11 @@ export default function Home() {
               </DialogContent>
             </Dialog>
             
-            <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#FCA311]/50 text-[#FCA311] hover:bg-[#FCA311]/10 backdrop-blur-sm">
-              <Mail className="mr-2 h-5 w-5" />
-              Email Us
+            <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#FCA311]/50 text-[#FCA311] hover:bg-[#FCA311]/10 backdrop-blur-sm" asChild>
+              <a href="mailto:brent@stewartservicestn.com">
+                <Mail className="mr-2 h-5 w-5" />
+                Email Us
+              </a>
             </Button>
           </div>
         </div>
@@ -1619,7 +1621,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  <span>info@stewartfixtureco.com</span>
+                  <span>brent@stewartservicestn.com</span>
                 </div>
               </div>
             </div>
