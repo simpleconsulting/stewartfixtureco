@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     siteName: 'Stewart Services',
     images: [
       {
-        url: '/icon_w_name.svg',
-        width: 347,
-        height: 96,
-        alt: 'Stewart Services Logo',
+        url: '/FIRST20_Promo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stewart Services - 20% Off Your First Service with Code FIRST20',
       },
     ],
     locale: 'en_US',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Stewart Services | Professional Fixture Installation',
     description: 'Professional installation of light fixtures, ceiling fans, switches, outlets, and home hardware across Middle Tennessee.',
-    images: ['/icon_w_name.svg'],
+    images: ['/FIRST20_Promo.png'],
   },
 };
 
