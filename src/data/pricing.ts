@@ -116,6 +116,13 @@ export const pricingMatrix: ServiceItem[] = [
     description: "Kitchen/bathroom hardware update"
   },
   {
+    id: "tv-mounting",
+    category: "Hardware & Other",
+    name: "TV Mounting with Cord Concealment",
+    price: 225,
+    description: "Professional TV installation with hidden cords"
+  },
+  {
     id: "quick-visit",
     category: "Hardware & Other",
     name: "Quick Visit (1 small task, <30 mins)",

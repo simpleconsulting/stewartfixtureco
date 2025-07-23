@@ -24,20 +24,20 @@ const topServices = [
     iconColor: "from-[#FCA311] to-[#000000]"
   },
   {
+    title: "TV Mounting with Cord Concealment",
+    headline: "Mount Your TV Like a Pro with Hidden Cords for a Clean Look.",
+    price: "$225",
+    description: "Professional TV installation with cord concealment for a sleek, finished appearance.",
+    image: "/tv_mounthing.png",
+    iconColor: "from-[#14213D] to-[#FCA311]"
+  },
+  {
     title: "Light Fixture & Pendant Swaps", 
     headline: "Refresh Any Room with a Fast, Professional Light Fixture Swap.",
     price: "Starting at $150",
     description: "Transform your space instantly. From vanity lights to chandeliers, we do it all.",
     image: "/pendant-light.png",
     iconColor: "from-[#000000] to-[#FCA311]"
-  },
-  {
-    title: "Switches & Outlet Upgrades",
-    headline: "Modernize Your Home with New Switches, Dimmers & Outlets.",
-    price: "Starting at $125", 
-    description: "GFCI outlets, USB ports, smart switches, and dimmer installations for safety and convenience.",
-    image: "/lightswitch.png",
-    iconColor: "from-[#14213D] to-[#000000]"
   }
 ];
 
@@ -687,28 +687,30 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-8 max-w-7xl mx-auto">
               {topServices.map((service, index) => {
                 return (
-                  <Card key={index} className="bg-white border-0 shadow-2xl rounded-3xl overflow-hidden h-[600px]">
-                    <CardContent className="p-8 h-full flex flex-col justify-center text-center">
-                      <div className="bg-gray-50 rounded-3xl mb-6 shadow-inner mx-auto w-24 h-24 overflow-hidden">
+                  <Card key={index} className="bg-white border-0 shadow-2xl rounded-3xl overflow-hidden h-[650px]">
+                    <CardContent className="p-6 h-full flex flex-col text-center">
+                      <div className="bg-gray-50 rounded-3xl mb-6 shadow-inner mx-auto w-40 h-40 overflow-hidden flex-shrink-0">
                         <Image
                           src={service.image}
                           alt={service.title}
-                          width={96}
-                          height={96}
-                          className="w-24 h-24 object-cover"
+                          width={256}
+                          height={256}
+                          className="w-40 h-40 object-cover"
+                          quality={100}
+                          style={{objectPosition: 'center'}}
                         />
                       </div>
-                      <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
+                      <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide min-h-[28px] flex items-center justify-center">
                         {service.title}
                       </h2>
-                      <h3 className="text-2xl font-bold text-[#14213D] mb-4 leading-tight">
+                      <h3 className="text-2xl font-bold text-[#14213D] mb-4 leading-tight min-h-[64px] flex items-center justify-center">
                         {service.headline}
                       </h3>
-                      <p className="text-base text-[#000000] mb-6 leading-relaxed">
+                      <p className="text-base text-[#000000] mb-6 leading-relaxed flex-1 flex items-center justify-center">
                         {service.description}
                       </p>
-                      <div className="flex flex-col items-center gap-4 mt-auto">
-                        <div className="text-4xl font-bold text-[#FCA311]">{service.price}</div>
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="text-4xl font-bold text-[#FCA311] min-h-[48px] flex items-center justify-center">{service.price}</div>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
@@ -903,9 +905,11 @@ export default function Home() {
                       <Image
                         src={service.image}
                         alt={service.title}
-                        width={80}
-                        height={80}
-                        className="w-20 h-20 object-cover"
+                        width={160}
+                        height={160}
+                        className="w-full h-full object-cover"
+                        quality={100}
+                        style={{objectPosition: 'center'}}
                       />
                     </div>
                     <h2 className="text-xl font-bold text-[#FCA311] mb-4 uppercase tracking-wide">
@@ -1326,7 +1330,7 @@ export default function Home() {
             <div>Quick Fixes</div>
             <div>Smart Switches</div>
             <div>GFCI Outlets</div>
-            <div>3-Way Switches</div>
+            <div>TV Mounting</div>
           </div>
           <p className="text-lg text-[#000000] mt-8 max-w-2xl mx-auto">
             From quick 30-minute fixes to full home upgrades — if it involves fixtures, switches, or hardware, we&apos;ve got you covered.
