@@ -1,7 +1,23 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm ci && npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "devCommand": "npm run dev"
+  "installCommand": "npm ci",
+  "devCommand": "npm run dev",
+  "env": {
+    "SKIP_ENV_VALIDATION": "true",
+    "NODE_ENV": "production",
+    "TAILWIND_CSS_ENGINE": "stable"
+  },
+  "build": {
+    "env": {
+      "SKIP_ENV_VALIDATION": "true",
+      "NODE_ENV": "production"
+    }
+  },
+  "functions": {
+    "app/**/*.{js,ts,jsx,tsx}": {
+      "maxDuration": 30
+    }
+  }
 }

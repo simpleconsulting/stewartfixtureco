@@ -7,3 +7,8 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Exclude problematic native dependencies during build
+node_modules/@lightningcss-*
+node_modules/**/lightningcss*
+**/*.node
