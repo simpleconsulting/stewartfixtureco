@@ -1,8 +1,8 @@
 {
-  "name": "Stewart Services - Professional Fixture Installation",
-  "short_name": "Stewart Services",
-  "description": "Professional installation of light fixtures, ceiling fans, switches, outlets, and home hardware in Middle Tennessee",
-  "start_url": "/",
+  "name": "Stewart Services Admin",
+  "short_name": "Stewart Admin",
+  "description": "Mobile admin app for Stewart Services - manage clients, jobs, and services on the go",
+  "start_url": "/login",
   "display": "standalone",
   "background_color": "#14213D",
   "theme_color": "#FCA311",
@@ -12,9 +12,38 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["home", "services", "electrical"],
+  "categories": ["business", "productivity", "utilities"],
   "scope": "/",
-  "orientation": "portrait-primary"
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone"],
+  "launch_handler": {
+    "client_mode": "navigate-new"
+  }
 }

@@ -124,3 +124,70 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* PWA and Mobile Styles */
+@layer utilities {
+  /* Safe area for mobile devices with notches/dynamic islands */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Touch optimization */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* PWA viewport adjustments */
+  .pwa-viewport {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+}
+
+/* PWA Status Bar Styling */
+@media (display-mode: standalone) {
+  body {
+    /* Adjust for PWA status bar */
+    padding-top: env(safe-area-inset-top);
+    background-color: #14213D; /* Match theme color */
+  }
+  
+  /* Hide scrollbars in PWA mode for cleaner look */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  html {
+    scrollbar-width: none;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+  
+  /* Disable zoom on inputs */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: contain;
+}

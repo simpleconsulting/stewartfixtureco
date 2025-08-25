@@ -7,12 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { AddressAutocomplete } from "@/components/ui/address-autocomplete-new";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Plus, Minus } from "lucide-react";
-import { pricingMatrix, calculateTotal, getAllCategories, getServicesByCategory } from "@/data/pricing";
+import { 
+  useServicesByCategory, 
+  calculateTotal
+} from "@/lib/services";
+import { createLeadFromQuote } from "@/lib/database";
+import { createClient } from "@/lib/supabase/client";
+import type { PlaceDetails } from "@/lib/places-api";
+import { useUTMTracking } from "@/lib/utm";
 
 const topServices = [
   {
@@ -43,9 +51,15 @@ const topServices = [
 
 const serviceAreas = ["Spring Hill", "Franklin", "Thompson's Station", "Columbia"];
 
-const allServices = pricingMatrix;
+// This will be replaced by the hook in the component
 
 export default function Home() {
+  // Load services from database
+  const { servicesByCategory, categories, loading, error } = useServicesByCategory();
+  
+  // Track UTM parameters
+  const utmParams = useUTMTracking();
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,6 +70,7 @@ export default function Home() {
     discountCode: ""
   });
   
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [calculatedQuote, setCalculatedQuote] = useState<number | null>(null);
   const [showQuote, setShowQuote] = useState(false);
 
@@ -104,7 +119,8 @@ export default function Home() {
   };
   
   const getCurrentTotal = () => {
-    return calculateTotal(formData.serviceQuantities);
+    if (loading || error) return 0;
+    return calculateTotal(Object.values(servicesByCategory).flat(), formData.serviceQuantities);
   };
   
   const getCurrentTotalWithDiscount = () => {
@@ -126,9 +142,41 @@ export default function Home() {
     return total;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const extractAddressComponents = (placeDetails: PlaceDetails | null) => {
+    if (!placeDetails) return {};
+
+    const components = placeDetails.addressComponents;
+    const result: Record<string, string | number | undefined> = {};
+
+    // Extract address components
+    const streetNumber = components.find(c => c.types.includes('street_number'))?.longText;
+    const route = components.find(c => c.types.includes('route'))?.longText;
+    
+    if (streetNumber && route) {
+      result.address_line1 = `${streetNumber} ${route}`;
+    } else if (route) {
+      result.address_line1 = route;
+    }
+
+    result.city = components.find(c => c.types.includes('locality'))?.longText;
+    result.state = components.find(c => c.types.includes('administrative_area_level_1'))?.shortText;
+    result.postal_code = components.find(c => c.types.includes('postal_code'))?.longText;
+    result.country = components.find(c => c.types.includes('country'))?.shortText || 'US';
+
+    // Add coordinates
+    if (placeDetails.location) {
+      result.lat = placeDetails.location.latitude;
+      result.lng = placeDetails.location.longitude;
+    }
+
+    return result;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let quote = calculateTotal(formData.serviceQuantities);
+    if (loading || error) return;
+    
+    let quote = calculateTotal(Object.values(servicesByCategory).flat(), formData.serviceQuantities);
     
     // Apply bundle discount first if applicable
     const serviceCount = getTotalServiceCount();
@@ -142,6 +190,44 @@ export default function Home() {
     if (formData.discountCode) {
       quote = applyDiscountCode(quote, formData.discountCode);
     }
+    
+    // Create lead in parallel (don't block quote display)
+    const createLead = async () => {
+      try {
+        const supabase = createClient();
+        const addressComponents = extractAddressComponents(placeDetails);
+        
+        const leadInfo = {
+          full_name: formData.name || undefined,
+          email: formData.email || undefined,
+          phone: formData.phone || undefined,
+          service_notes: formData.message || undefined,
+          ...addressComponents,
+          ...utmParams  // Include UTM parameters
+        };
+
+        const { data: leadResult, error: leadError } = await createLeadFromQuote(
+          supabase,
+          leadInfo,
+          formData.serviceQuantities  // Pass the full quantities object
+        );
+
+        if (leadError) {
+          console.error("Error saving lead:", leadError);
+        } else {
+          const serviceCount = Object.keys(formData.serviceQuantities).length;
+          console.log(`✅ Lead saved successfully with ${serviceCount} service${serviceCount !== 1 ? 's' : ''}`);
+          if (leadResult?.leadId) {
+            console.log(`Lead ID: ${leadResult.leadId}`);
+          }
+        }
+      } catch (error) {
+        console.error("Unexpected error creating lead:", error);
+      }
+    };
+
+    // Create lead without blocking the UI
+    createLead();
     
     setCalculatedQuote(quote);
     setShowQuote(true);
@@ -233,10 +319,14 @@ export default function Home() {
                       <div>
                         <Label className="text-[#14213D] font-semibold">Services Needed</Label>
                         <div className="mt-2 max-h-64 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                          {getAllCategories().map(category => (
+                          {loading ? (
+                            <div className="text-center py-4 text-[#14213D]">Loading services...</div>
+                          ) : error ? (
+                            <div className="text-center py-4 text-red-600">Error loading services: {error}</div>
+                          ) : categories.map(category => (
                             <div key={category} className="mb-6">
                               <h4 className="font-semibold text-[#14213D] text-sm mb-3">{category}</h4>
-                              {getServicesByCategory(category).map(service => (
+                              {servicesByCategory[category]?.map(service => (
                                 <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-2">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3 flex-1">
@@ -328,11 +418,12 @@ export default function Home() {
                       </div>
                       <div>
                         <Label htmlFor="address" className="text-[#14213D] font-semibold">Service Address</Label>
-                        <Input
+                        <AddressAutocomplete
                           id="address"
                           value={formData.address}
-                          onChange={(e) => handleInputChange("address", e.target.value)}
-                          className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                          onChange={(value) => handleInputChange("address", value)}
+                          onPlaceSelected={setPlaceDetails}
+                          className="mt-1"
                           placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                           required
                         />
@@ -410,15 +501,11 @@ export default function Home() {
                       <p className="text-[#000000] text-lg">Professional installation with transparent flat-rate pricing</p>
                     </DialogHeader>
                     <div className="grid gap-8 pt-4">
-                      {Object.entries(
-                        allServices.reduce((acc, service) => {
-                          if (!acc[service.category]) {
-                            acc[service.category] = [];
-                          }
-                          acc[service.category].push(service);
-                          return acc;
-                        }, {} as Record<string, typeof allServices>)
-                      ).map(([category, services]) => (
+                      {loading ? (
+                        <div className="text-center py-8 text-[#14213D]">Loading services...</div>
+                      ) : error ? (
+                        <div className="text-center py-8 text-red-600">Error loading services: {error}</div>
+                      ) : Object.entries(servicesByCategory).map(([category, services]) => (
                         <div key={category} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-[#FCA311]/20">
                           <h3 className="text-xl font-bold text-[#14213D] mb-4 border-b border-[#FCA311]/30 pb-2">
                             {category}
@@ -490,11 +577,12 @@ export default function Home() {
                               </div>
                               <div>
                                 <Label htmlFor="services-address" className="text-[#14213D] font-semibold">Service Address</Label>
-                                <Input
+                                <AddressAutocomplete
                                   id="services-address"
                                   value={formData.address}
-                                  onChange={(e) => handleInputChange("address", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
+                                  onChange={(value) => handleInputChange("address", value)}
+                                  onPlaceSelected={setPlaceDetails}
+                                  className="mt-1"
                                   placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                                   required
                                 />
@@ -503,10 +591,14 @@ export default function Home() {
                             <div>
                               <Label className="text-[#14213D] font-semibold">Services Needed</Label>
                               <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                                {getAllCategories().map(category => (
+                                {loading ? (
+                                  <div className="text-center py-4 text-[#14213D]">Loading services...</div>
+                                ) : error ? (
+                                  <div className="text-center py-4 text-red-600">Error loading services</div>
+                                ) : categories.map(category => (
                                   <div key={category} className="mb-4">
                                     <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                                    {getServicesByCategory(category).map(service => (
+                                    {servicesByCategory[category]?.map(service => (
                                       <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center space-x-3 flex-1">
@@ -760,10 +852,11 @@ export default function Home() {
                               </div>
                               <div>
                                 <Label htmlFor={`desktop-address-${index}`}>Service Address</Label>
-                                <Input
+                                <AddressAutocomplete
                                   id={`desktop-address-${index}`}
                                   value={formData.address}
-                                  onChange={(e) => handleInputChange("address", e.target.value)}
+                                  onChange={(value) => handleInputChange("address", value)}
+                                  onPlaceSelected={setPlaceDetails}
                                   placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                                   required
                                 />
@@ -771,10 +864,14 @@ export default function Home() {
                               <div>
                                 <Label className="text-[#14213D] font-semibold">Services Needed</Label>
                                 <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
-                                  {getAllCategories().map(category => (
+                                  {loading ? (
+                                    <div className="text-center py-2 text-[#14213D] text-xs">Loading...</div>
+                                  ) : error ? (
+                                    <div className="text-center py-2 text-red-600 text-xs">Error</div>
+                                  ) : categories.map(category => (
                                     <div key={category} className="mb-3">
                                       <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
-                                      {getServicesByCategory(category).map(svc => (
+                                      {servicesByCategory[category]?.map(svc => (
                                         <div key={svc.id} className="mb-1">
                                           <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2 flex-1">
@@ -966,10 +1063,11 @@ export default function Home() {
                             </div>
                             <div>
                               <Label htmlFor={`mobile-address-${index}`}>Service Address</Label>
-                              <Input
+                              <AddressAutocomplete
                                 id={`mobile-address-${index}`}
                                 value={formData.address}
-                                onChange={(e) => handleInputChange("address", e.target.value)}
+                                onChange={(value) => handleInputChange("address", value)}
+                                onPlaceSelected={setPlaceDetails}
                                 placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                                 required
                               />
@@ -977,10 +1075,14 @@ export default function Home() {
                             <div>
                               <Label className="text-[#14213D] font-semibold">Services Needed</Label>
                               <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
-                                {getAllCategories().map(category => (
+                                {loading ? (
+                                  <div className="text-center py-2 text-[#14213D] text-xs">Loading...</div>
+                                ) : error ? (
+                                  <div className="text-center py-2 text-red-600 text-xs">Error</div>
+                                ) : categories.map(category => (
                                   <div key={category} className="mb-3">
                                     <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
-                                    {getServicesByCategory(category).map(svc => (
+                                    {servicesByCategory[category]?.map(svc => (
                                       <div key={svc.id} className="mb-1">
                                         <div className="flex items-center justify-between">
                                           <div className="flex items-center space-x-2 flex-1">
@@ -1155,10 +1257,11 @@ export default function Home() {
                   </div>
                   <div>
                     <Label htmlFor="bundle-address">Service Address</Label>
-                    <Input
+                    <AddressAutocomplete
                       id="bundle-address"
                       value={formData.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
+                      onChange={(value) => handleInputChange("address", value)}
+                      onPlaceSelected={setPlaceDetails}
                       placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                       required
                     />
@@ -1166,10 +1269,14 @@ export default function Home() {
                   <div>
                     <Label className="text-[#14213D] font-semibold">Services to Bundle (Need 3+ total services for 10% discount)</Label>
                     <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                      {getAllCategories().map(category => (
+                      {loading ? (
+                        <div className="text-center py-4 text-[#14213D]">Loading services...</div>
+                      ) : error ? (
+                        <div className="text-center py-4 text-red-600">Error loading services</div>
+                      ) : categories.map(category => (
                         <div key={category} className="mb-4">
                           <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                          {getServicesByCategory(category).map(service => (
+                          {servicesByCategory[category]?.map(service => (
                             <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3 flex-1">
@@ -1434,10 +1541,14 @@ export default function Home() {
                   <div>
                     <Label className="text-[#14213D] font-semibold">Services Needed (Select All That Apply)</Label>
                     <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                      {getAllCategories().map(category => (
+                      {loading ? (
+                        <div className="text-center py-4 text-[#14213D]">Loading services...</div>
+                      ) : error ? (
+                        <div className="text-center py-4 text-red-600">Error loading services</div>
+                      ) : categories.map(category => (
                         <div key={category} className="mb-4">
                           <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                          {getServicesByCategory(category).map(service => (
+                          {servicesByCategory[category]?.map(service => (
                             <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3 flex-1">
@@ -1522,10 +1633,11 @@ export default function Home() {
                   </div>
                   <div>
                     <Label htmlFor="address2">Service Address</Label>
-                    <Input
+                    <AddressAutocomplete
                       id="address2"
                       value={formData.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
+                      onChange={(value) => handleInputChange("address", value)}
+                      onPlaceSelected={setPlaceDetails}
                       placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
                       required
                     />

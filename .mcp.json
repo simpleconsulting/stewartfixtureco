@@ -1,0 +1,23 @@
+{
+    "mcpServers": {
+      "supabase": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest",
+          "--access-token",
+          "sbp_032d408f3483430e649845443f65e2689fd243b4"
+        ]
+      },
+      "browser-tools": {
+        "command": "npx",
+        "args": [
+          "@agentdeskai/browser-tools-mcp@1.2.0"
+        ]
+      },
+      "context7": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp"]
+      }
+    }
+  }
