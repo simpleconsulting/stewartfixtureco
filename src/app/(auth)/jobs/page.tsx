@@ -1,67 +1,68 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Calendar, DollarSign, Clock, MapPin } from 'lucide-react'
+import { Search, Calendar, DollarSign, Clock, MapPin, Briefcase } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { fetchJobs, updateJobStatus } from '@/lib/database'
+import type { Database } from '@/types/database'
+
+type Job = Database['public']['Tables']['jobs']['Row'] & {
+  clients?: Database['public']['Tables']['clients']['Row']
+}
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [error, setError] = useState<string | null>(null)
+  
+  const supabase = createClient()
 
-  // Mock jobs data - will be replaced with real data from database
-  const jobs = [
-    {
-      id: '1',
-      clientName: 'Johnson Family',
-      service: 'Ceiling Fan Installation',
-      status: 'scheduled',
-      scheduledDate: '2024-01-24T14:00:00',
-      address: '123 Oak Street, Spring Hill, TN',
-      totalAmount: 20000,
-      paymentStatus: 'unpaid',
-      createdDate: '2024-01-20',
-      notes: 'Customer prefers afternoon appointment'
-    },
-    {
-      id: '2',
-      clientName: 'Smith Residence',
-      service: 'TV Mounting',
-      status: 'in_progress',
-      scheduledDate: '2024-01-23T10:00:00',
-      address: '456 Pine Avenue, Thompson\'s Station, TN',
-      totalAmount: 22500,
-      paymentStatus: 'partial',
-      createdDate: '2024-01-18',
-      notes: '65" TV, needs wall mount kit'
-    },
-    {
-      id: '3',
-      clientName: 'Davis Home',
-      service: 'Light Fixture Replacement',
-      status: 'completed',
-      scheduledDate: '2024-01-22T09:00:00',
-      address: '789 Maple Drive, Columbia, TN',
-      totalAmount: 15000,
-      paymentStatus: 'paid',
-      createdDate: '2024-01-15',
-      notes: 'Kitchen pendant lights'
-    },
-    {
-      id: '4',
-      clientName: 'Wilson Property',
-      service: 'Dimmer Switch Install',
-      status: 'quoted',
-      scheduledDate: null,
-      address: '321 Cedar Lane, Spring Hill, TN',
-      totalAmount: 12500,
-      paymentStatus: 'unpaid',
-      createdDate: '2024-01-21',
-      notes: 'Multiple rooms - dining and living'
+  const loadJobs = useCallback(async () => {
+    try {
+      setLoading(true)
+      const { data, error: fetchError } = await fetchJobs(supabase, {
+        limit: 50,
+        status: statusFilter === 'all' ? undefined : statusFilter as Database['public']['Enums']['job_status'],
+        search: searchTerm || undefined
+      })
+
+      if (fetchError) {
+        setError(fetchError)
+        setJobs([])
+      } else {
+        setJobs(data || [])
+        setError(null)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load jobs')
+      setJobs([])
+    } finally {
+      setLoading(false)
     }
-  ]
+  }, [supabase, statusFilter, searchTerm])
+
+  useEffect(() => {
+    loadJobs()
+  }, [loadJobs])
+
+  const handleStatusChange = async (jobId: string, newStatus: Database['public']['Enums']['job_status']) => {
+    try {
+      const { data, error: updateError } = await updateJobStatus(supabase, jobId, newStatus)
+      if (updateError) {
+        console.error('Failed to update job status:', updateError)
+      } else if (data?.success) {
+        loadJobs()
+      }
+    } catch (err) {
+      console.error('Error updating job status:', err)
+    }
+  }
 
   const statusOptions = [
     { value: 'all', label: 'All Jobs', count: jobs.length },
@@ -69,15 +70,9 @@ export default function JobsPage() {
     { value: 'quoted', label: 'Quoted', count: jobs.filter(j => j.status === 'quoted').length },
     { value: 'scheduled', label: 'Scheduled', count: jobs.filter(j => j.status === 'scheduled').length },
     { value: 'in_progress', label: 'In Progress', count: jobs.filter(j => j.status === 'in_progress').length },
-    { value: 'completed', label: 'Completed', count: jobs.filter(j => j.status === 'completed').length }
+    { value: 'completed', label: 'Completed', count: jobs.filter(j => j.status === 'completed').length },
+    { value: 'canceled', label: 'Canceled', count: jobs.filter(j => j.status === 'canceled').length }
   ]
-
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.service.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || job.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toLocaleString()}`
@@ -91,6 +86,15 @@ export default function JobsPage() {
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
+    })
+  }
+
+  const formatDateOnly = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
     })
   }
 
@@ -111,8 +115,28 @@ export default function JobsPage() {
       case 'unpaid': return 'bg-red-100 text-red-800'
       case 'partial': return 'bg-yellow-100 text-yellow-800'
       case 'paid': return 'bg-green-100 text-green-800'
+      case 'refunded': return 'bg-blue-100 text-blue-800'
       default: return 'bg-gray-100 text-gray-800'
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
+            <p className="text-sm text-gray-600">Track and manage your jobs</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FCA311] mx-auto"></div>
+            <p className="text-sm text-gray-600 mt-2">Loading jobs...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -123,22 +147,39 @@ export default function JobsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
           <p className="text-sm text-gray-600">Track and manage your jobs</p>
         </div>
-        <Button size="sm" className="bg-[#FCA311] hover:bg-[#FCA311]/90 text-[#14213D]">
-          <Plus className="w-4 h-4 mr-2" />
-          New Job
-        </Button>
+        <div className="flex items-center gap-2">
+          <Briefcase className="w-5 h-5 text-[#FCA311]" />
+          <span className="text-sm font-medium text-gray-600">
+            {jobs.length} total
+          </span>
+        </div>
       </div>
 
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
-          placeholder="Search jobs..."
+          placeholder="Search jobs by client or notes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
         />
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-sm text-red-600">Error: {error}</p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={loadJobs}
+            className="mt-2"
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
 
       {/* Status Filter Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -161,30 +202,36 @@ export default function JobsPage() {
 
       {/* Jobs List */}
       <div className="space-y-3">
-        {filteredJobs.map((job) => (
+        {jobs.map((job) => (
           <Card key={job.id}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-sm">{job.clientName}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-sm">
+                      {job.clients?.full_name || 'Unknown Client'}
+                    </h3>
                     <Badge className={getStatusColor(job.status)}>
                       {job.status.replace('_', ' ')}
                     </Badge>
                   </div>
                   
-                  <p className="text-xs text-gray-600 mb-2">{job.service}</p>
-                  
                   {/* Job Details */}
-                  <div className="space-y-1 mb-2">
+                  <div className="space-y-1 mb-3">
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                       <Calendar className="w-3 h-3" />
-                      {formatDate(job.scheduledDate)}
+                      {job.scheduled_start 
+                        ? formatDate(job.scheduled_start) 
+                        : 'Not scheduled'}
                     </div>
-                    <div className="flex items-start gap-2 text-xs text-gray-600">
-                      <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                      <span>{job.address}</span>
-                    </div>
+                    {(job.address_line1 || job.city) && (
+                      <div className="flex items-start gap-2 text-xs text-gray-600">
+                        <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        <span>
+                          {[job.address_line1, job.city, job.state].filter(Boolean).join(', ')}
+                        </span>
+                      </div>
+                    )}
                     {job.notes && (
                       <div className="flex items-start gap-2 text-xs text-gray-600">
                         <Clock className="w-3 h-3 mt-0.5 flex-shrink-0" />
@@ -195,25 +242,77 @@ export default function JobsPage() {
 
                   {/* Amount and Payment Status */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-3 h-3" />
-                      <span className="text-sm font-semibold">{formatPrice(job.totalAmount)}</span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-3 h-3" />
+                        <span className="text-sm font-semibold">
+                          {formatPrice(job.final_price_cents)}
+                        </span>
+                      </div>
+                      {job.quoted_price_cents !== job.final_price_cents && (
+                        <span className="text-xs text-gray-500">
+                          Quoted: {formatPrice(job.quoted_price_cents)}
+                        </span>
+                      )}
                     </div>
-                    <Badge className={getPaymentStatusColor(job.paymentStatus)}>
-                      {job.paymentStatus}
+                    <Badge className={getPaymentStatusColor(job.payment_status)}>
+                      {job.payment_status}
                     </Badge>
+                  </div>
+
+                  {/* Created Date */}
+                  <div className="mt-2 text-xs text-gray-500">
+                    Created: {formatDateOnly(job.created_at)}
                   </div>
                 </div>
               </div>
 
               {/* Quick Actions */}
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                  View Details
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8"
+                  onClick={() => {
+                    // Status progression logic
+                    const nextStatus = 
+                      job.status === 'draft' ? 'quoted' :
+                      job.status === 'quoted' ? 'scheduled' :
+                      job.status === 'scheduled' ? 'in_progress' :
+                      job.status === 'in_progress' ? 'completed' :
+                      job.status
+                    
+                    if (nextStatus !== job.status) {
+                      handleStatusChange(job.id, nextStatus as Database['public']['Enums']['job_status'])
+                    }
+                  }}
+                >
+                  {job.status === 'draft' ? 'Quote' :
+                   job.status === 'quoted' ? 'Schedule' :
+                   job.status === 'scheduled' ? 'Start' :
+                   job.status === 'in_progress' ? 'Complete' :
+                   'View Details'}
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                  Update Status
-                </Button>
+                {job.clients?.email && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => window.open(`mailto:${job.clients?.email}`, '_blank')}
+                  >
+                    Email
+                  </Button>
+                )}
+                {job.clients?.phone && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => window.open(`tel:${job.clients?.phone}`, '_blank')}
+                  >
+                    Call
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -221,14 +320,18 @@ export default function JobsPage() {
       </div>
 
       {/* Empty State */}
-      {filteredJobs.length === 0 && (
+      {jobs.length === 0 && !loading && !error && (
         <Card>
           <CardContent className="p-8 text-center">
             <div className="text-gray-400 mb-2">
-              <Search className="w-8 h-8 mx-auto" />
+              <Briefcase className="w-8 h-8 mx-auto" />
             </div>
             <p className="text-sm text-gray-600">No jobs found</p>
-            <p className="text-xs text-gray-500">Try adjusting your search or filter</p>
+            <p className="text-xs text-gray-500">
+              {searchTerm || statusFilter !== 'all'
+                ? 'Try adjusting your search or filter'
+                : 'Jobs will appear here when you create them from leads or clients'}
+            </p>
           </CardContent>
         </Card>
       )}

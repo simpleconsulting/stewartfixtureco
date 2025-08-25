@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Home, Wrench, Users, Briefcase } from 'lucide-react'
+import { Home, Wrench, Users, Briefcase, UserCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -10,6 +10,11 @@ const navItems = [
     label: 'Dashboard',
     href: '/dashboard',
     icon: Home,
+  },
+  {
+    label: 'Leads',
+    href: '/leads',
+    icon: UserCheck,
   },
   {
     label: 'Services',

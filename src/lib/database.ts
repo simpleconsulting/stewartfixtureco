@@ -350,3 +350,523 @@ export async function createLeadFromQuote(
     return { data: { leadId }, error: null }
   })
 }
+
+// Lead management database functions
+
+// Fetch all leads with pagination
+export async function fetchLeads(
+  supabase: SupabaseClientType,
+  options?: {
+    limit?: number
+    offset?: number
+    status?: Database['public']['Enums']['lead_status']
+    search?: string
+  }
+): Promise<{ data: Database['public']['Tables']['leads']['Row'][] | null; error: string | null }> {
+  const { limit = 50, offset = 0, status, search } = options || {}
+  
+  return executeQuery(async () => {
+    let query = supabase
+      .from('leads')
+      .select(`
+        *,
+        lead_service_interests (
+          quantity,
+          service_offering_id,
+          service_offerings (
+            id,
+            name,
+            base_price_cents
+          )
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    if (search) {
+      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`)
+    }
+
+    const { data, error } = await query
+
+    return { data, error }
+  })
+}
+
+// Fetch a single lead by ID with service interests
+export async function fetchLeadById(
+  supabase: SupabaseClientType,
+  id: string
+): Promise<{ data: Database['public']['Tables']['leads']['Row'] | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('leads')
+      .select(`
+        *,
+        lead_service_interests (
+          quantity,
+          service_offering_id,
+          service_offerings (
+            id,
+            name,
+            base_price_cents,
+            description
+          )
+        )
+      `)
+      .eq('id', id)
+      .single()
+    
+    return { data, error }
+  })
+}
+
+// Update lead status
+export async function updateLeadStatus(
+  supabase: SupabaseClientType,
+  id: string,
+  status: Database['public']['Enums']['lead_status'],
+  notes?: string
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const updateData: Partial<Database['public']['Tables']['leads']['Update']> = {
+      status,
+      updated_at: new Date().toISOString()
+    }
+    
+    if (notes) {
+      updateData.notes = notes
+    }
+
+    if (status === 'contacted') {
+      // Get current contact count first
+      const { data: currentLead } = await supabase
+        .from('leads')
+        .select('contact_count')
+        .eq('id', id)
+        .single()
+
+      const newContactCount = (currentLead?.contact_count || 0) + 1
+      
+      updateData.last_contacted_at = new Date().toISOString()
+      updateData.contact_count = newContactCount
+    }
+
+    const { error } = await supabase
+      .from('leads')
+      .update(updateData)
+      .eq('id', id)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { data: { success: true }, error: null }
+  })
+}
+
+// Convert lead to client
+export async function convertLeadToClient(
+  supabase: SupabaseClientType,
+  leadId: string,
+  clientData?: {
+    full_name?: string
+    phone?: string
+    notes?: string
+  }
+): Promise<{ data: { clientId: string } | null; error: string | null }> {
+  return executeQuery(async () => {
+    // First, get the lead data
+    const { data: lead, error: leadError } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('id', leadId)
+      .single()
+
+    if (leadError || !lead) {
+      throw new Error('Lead not found')
+    }
+
+    // Create the client
+    const clientInsert = {
+      full_name: clientData?.full_name || lead.full_name || 'Unknown Client',
+      email: lead.email,
+      phone: clientData?.phone || lead.phone,
+      address_line1: lead.address_line1,
+      address_line2: lead.address_line2,
+      city: lead.city,
+      state: lead.state,
+      postal_code: lead.postal_code,
+      country: lead.country,
+      lat: lead.lat,
+      lng: lead.lng,
+      notes: clientData?.notes || lead.notes,
+      is_active: true
+    }
+
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .insert([clientInsert])
+      .select('id')
+      .single()
+
+    if (clientError || !client) {
+      throw new Error('Failed to create client')
+    }
+
+    // Update the lead to mark it as converted
+    await supabase
+      .from('leads')
+      .update({
+        status: 'converted' as Database['public']['Enums']['lead_status'],
+        converted_client_id: client.id,
+        converted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', leadId)
+
+    return { data: { clientId: client.id }, error: null }
+  })
+}
+
+// Get lead statistics
+export async function getLeadStats(
+  supabase: SupabaseClientType
+): Promise<{ 
+  data: {
+    total: number
+    new: number
+    contacted: number
+    qualified: number
+    converted: number
+    returningLeads: number
+    avgConversionTime?: number
+  } | null; 
+  error: string | null 
+}> {
+  return executeQuery(async () => {
+    // Get counts by status
+    const { data: statusCounts, error: statusError } = await supabase
+      .from('leads')
+      .select('status')
+
+    if (statusError) {
+      throw statusError
+    }
+
+    // Get returning leads count
+    const { count: returningCount, error: returningError } = await supabase
+      .from('leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_returning', true)
+
+    if (returningError) {
+      throw returningError
+    }
+
+    // Process the data
+    const stats = {
+      total: statusCounts?.length || 0,
+      new: statusCounts?.filter(l => l.status === 'new').length || 0,
+      contacted: statusCounts?.filter(l => l.status === 'contacted').length || 0,
+      qualified: statusCounts?.filter(l => l.status === 'qualified').length || 0,
+      converted: statusCounts?.filter(l => l.status === 'converted').length || 0,
+      returningLeads: returningCount || 0
+    }
+
+    return { data: stats, error: null }
+  })
+}
+
+// Client-specific database functions
+
+// Fetch all clients with pagination and job stats
+export async function fetchClients(
+  supabase: SupabaseClientType,
+  options?: {
+    limit?: number
+    offset?: number
+    search?: string
+  }
+): Promise<{ data: Database['public']['Tables']['clients']['Row'][] | null; error: string | null }> {
+  const { limit = 50, offset = 0, search } = options || {}
+  
+  return executeQuery(async () => {
+    let query = supabase
+      .from('clients')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (search) {
+      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`)
+    }
+
+    const { data, error } = await query
+
+    return { data, error }
+  })
+}
+
+// Fetch a single client by ID with job history
+export async function fetchClientById(
+  supabase: SupabaseClientType,
+  id: string
+): Promise<{ data: Database['public']['Tables']['clients']['Row'] | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('id', id)
+      .eq('is_active', true)
+      .single()
+    
+    return { data, error }
+  })
+}
+
+// Update client information
+export async function updateClient(
+  supabase: SupabaseClientType,
+  id: string,
+  clientData: Partial<Database['public']['Tables']['clients']['Update']>
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const updateData = {
+      ...clientData,
+      updated_at: new Date().toISOString()
+    }
+
+    const { error } = await supabase
+      .from('clients')
+      .update(updateData)
+      .eq('id', id)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { data: { success: true }, error: null }
+  })
+}
+
+// Get client statistics
+export async function getClientStats(
+  supabase: SupabaseClientType
+): Promise<{ 
+  data: {
+    total: number
+    totalRevenue: number
+    totalJobs: number
+    averageJobValue: number
+  } | null; 
+  error: string | null 
+}> {
+  return executeQuery(async () => {
+    // Get client count
+    const { data: clients, error: clientError } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('is_active', true)
+
+    if (clientError) {
+      throw clientError
+    }
+
+    // Get job statistics
+    const { data: jobs, error: jobError } = await supabase
+      .from('jobs')
+      .select('final_price_cents')
+
+    if (jobError) {
+      throw jobError
+    }
+
+    const totalRevenue = jobs?.reduce((sum, job) => sum + (job.final_price_cents || 0), 0) || 0
+    const totalJobs = jobs?.length || 0
+    const averageJobValue = totalJobs > 0 ? totalRevenue / totalJobs : 0
+
+    const stats = {
+      total: clients?.length || 0,
+      totalRevenue,
+      totalJobs,
+      averageJobValue
+    }
+
+    return { data: stats, error: null }
+  })
+}
+
+// Job-specific database functions
+
+// Fetch all jobs with client information
+export async function fetchJobs(
+  supabase: SupabaseClientType,
+  options?: {
+    limit?: number
+    offset?: number
+    status?: Database['public']['Enums']['job_status']
+    search?: string
+  }
+): Promise<{ data: (Database['public']['Tables']['jobs']['Row'] & { client?: Database['public']['Tables']['clients']['Row'] })[] | null; error: string | null }> {
+  const { limit = 50, offset = 0, status, search } = options || {}
+  
+  return executeQuery(async () => {
+    let query = supabase
+      .from('jobs')
+      .select(`
+        *,
+        clients (
+          id,
+          full_name,
+          email,
+          phone
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    if (search) {
+      query = query.or(`notes.ilike.%${search}%,clients.full_name.ilike.%${search}%`)
+    }
+
+    const { data, error } = await query
+
+    return { data, error }
+  })
+}
+
+// Fetch a single job by ID with client information
+export async function fetchJobById(
+  supabase: SupabaseClientType,
+  id: string
+): Promise<{ data: (Database['public']['Tables']['jobs']['Row'] & { client?: Database['public']['Tables']['clients']['Row'] }) | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        clients (
+          id,
+          full_name,
+          email,
+          phone,
+          address_line1,
+          city,
+          state
+        )
+      `)
+      .eq('id', id)
+      .single()
+    
+    return { data, error }
+  })
+}
+
+// Update job status
+export async function updateJobStatus(
+  supabase: SupabaseClientType,
+  id: string,
+  status: Database['public']['Enums']['job_status'],
+  notes?: string
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const updateData: Partial<Database['public']['Tables']['jobs']['Update']> = {
+      status,
+      updated_at: new Date().toISOString()
+    }
+    
+    if (notes) {
+      updateData.notes = notes
+    }
+
+    const { error } = await supabase
+      .from('jobs')
+      .update(updateData)
+      .eq('id', id)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { data: { success: true }, error: null }
+  })
+}
+
+// Update job payment status
+export async function updateJobPaymentStatus(
+  supabase: SupabaseClientType,
+  id: string,
+  paymentStatus: Database['public']['Enums']['payment_status']
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { error } = await supabase
+      .from('jobs')
+      .update({
+        payment_status: paymentStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { data: { success: true }, error: null }
+  })
+}
+
+// Get job statistics
+export async function getJobStats(
+  supabase: SupabaseClientType
+): Promise<{ 
+  data: {
+    total: number
+    draft: number
+    quoted: number
+    scheduled: number
+    inProgress: number
+    completed: number
+    canceled: number
+    totalRevenue: number
+    averageJobValue: number
+  } | null; 
+  error: string | null 
+}> {
+  return executeQuery(async () => {
+    // Get all jobs with status and revenue data
+    const { data: jobs, error: jobsError } = await supabase
+      .from('jobs')
+      .select('status, final_price_cents')
+
+    if (jobsError) {
+      throw jobsError
+    }
+
+    const totalRevenue = jobs?.reduce((sum, job) => sum + (job.final_price_cents || 0), 0) || 0
+    const totalJobs = jobs?.length || 0
+
+    const stats = {
+      total: totalJobs,
+      draft: jobs?.filter(j => j.status === 'draft').length || 0,
+      quoted: jobs?.filter(j => j.status === 'quoted').length || 0,
+      scheduled: jobs?.filter(j => j.status === 'scheduled').length || 0,
+      inProgress: jobs?.filter(j => j.status === 'in_progress').length || 0,
+      completed: jobs?.filter(j => j.status === 'completed').length || 0,
+      canceled: jobs?.filter(j => j.status === 'canceled').length || 0,
+      totalRevenue,
+      averageJobValue: totalJobs > 0 ? totalRevenue / totalJobs : 0
+    }
+
+    return { data: stats, error: null }
+  })
+}
