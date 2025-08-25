@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,23 @@ const serviceAreas = ["Spring Hill", "Franklin", "Thompson's Station", "Columbia
 // This will be replaced by the hook in the component
 
 export default function Home() {
+  const router = useRouter();
+  
+  // Check if user is authenticated and redirect to dashboard
+  useEffect(() => {
+    const checkAuthAndRedirect = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user && user.email?.toLowerCase().endsWith('@stewartservicestn.com')) {
+        router.push('/dashboard');
+        return;
+      }
+    };
+    
+    checkAuthAndRedirect();
+  }, [router]);
+  
   // Load services from database
   const { servicesByCategory, categories, loading, error } = useServicesByCategory();
   
