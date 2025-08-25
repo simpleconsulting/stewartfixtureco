@@ -533,6 +533,29 @@ export async function convertLeadToClient(
   })
 }
 
+// Update lead booking request status
+export async function updateLeadBookingRequest(
+  supabase: SupabaseClientType,
+  id: string,
+  hasBookingRequest: boolean
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { error } = await supabase
+      .from('leads')
+      .update({
+        booking_requested: hasBookingRequest,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+    
+    if (error) {
+      throw error
+    }
+    
+    return { data: { success: true }, error: null }
+  })
+}
+
 // Get lead statistics
 export async function getLeadStats(
   supabase: SupabaseClientType

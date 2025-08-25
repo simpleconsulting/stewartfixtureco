@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.4"
+  }
   public: {
     Tables: {
       attachments: {
@@ -166,153 +171,6 @@ export type Database = {
           },
         ]
       }
-      leads: {
-        Row: {
-          id: string
-          full_name: string | null
-          phone: string | null
-          email: string | null
-          address_line1: string | null
-          address_line2: string | null
-          city: string | null
-          state: string | null
-          postal_code: string | null
-          country: string | null
-          lat: number | null
-          lng: number | null
-          source: string | null
-          service_notes: string | null
-          preferred_days: string | null
-          preferred_time: string | null
-          status: Database["public"]["Enums"]["lead_status"]
-          owner: string | null
-          last_contacted_at: string | null
-          next_action_at: string | null
-          contact_count: number
-          converted_client_id: string | null
-          converted_job_id: string | null
-          converted_at: string | null
-          notes: string | null
-          utm_source: string | null
-          utm_medium: string | null
-          utm_campaign: string | null
-          utm_term: string | null
-          utm_content: string | null
-          submission_count: number
-          last_submission_at: string
-          is_returning: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          full_name?: string | null
-          phone?: string | null
-          email?: string | null
-          address_line1?: string | null
-          address_line2?: string | null
-          city?: string | null
-          state?: string | null
-          postal_code?: string | null
-          country?: string | null
-          lat?: number | null
-          lng?: number | null
-          source?: string | null
-          service_notes?: string | null
-          preferred_days?: string | null
-          preferred_time?: string | null
-          status?: Database["public"]["Enums"]["lead_status"]
-          owner?: string | null
-          last_contacted_at?: string | null
-          next_action_at?: string | null
-          contact_count?: number
-          converted_client_id?: string | null
-          converted_job_id?: string | null
-          converted_at?: string | null
-          notes?: string | null
-          utm_source?: string | null
-          utm_medium?: string | null
-          utm_campaign?: string | null
-          utm_term?: string | null
-          utm_content?: string | null
-          submission_count?: number
-          last_submission_at?: string
-          is_returning?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          full_name?: string | null
-          phone?: string | null
-          email?: string | null
-          address_line1?: string | null
-          address_line2?: string | null
-          city?: string | null
-          state?: string | null
-          postal_code?: string | null
-          country?: string | null
-          lat?: number | null
-          lng?: number | null
-          source?: string | null
-          service_notes?: string | null
-          preferred_days?: string | null
-          preferred_time?: string | null
-          status?: Database["public"]["Enums"]["lead_status"]
-          owner?: string | null
-          last_contacted_at?: string | null
-          next_action_at?: string | null
-          contact_count?: number
-          converted_client_id?: string | null
-          converted_job_id?: string | null
-          converted_at?: string | null
-          notes?: string | null
-          utm_source?: string | null
-          utm_medium?: string | null
-          utm_campaign?: string | null
-          utm_term?: string | null
-          utm_content?: string | null
-          submission_count?: number
-          last_submission_at?: string
-          is_returning?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      lead_service_interests: {
-        Row: {
-          lead_id: string
-          service_offering_id: string
-          quantity: number
-        }
-        Insert: {
-          lead_id: string
-          service_offering_id: string
-          quantity?: number
-        }
-        Update: {
-          lead_id?: string
-          service_offering_id?: string
-          quantity?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "lead_service_interests_lead_id_fkey"
-            columns: ["lead_id"]
-            isOneToOne: false
-            referencedRelation: "leads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lead_service_interests_service_offering_id_fkey"
-            columns: ["service_offering_id"]
-            isOneToOne: false
-            referencedRelation: "service_offerings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       jobs: {
         Row: {
           address_line1: string | null
@@ -392,6 +250,156 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lead_service_interests: {
+        Row: {
+          lead_id: string
+          quantity: number
+          service_offering_id: string
+        }
+        Insert: {
+          lead_id: string
+          quantity?: number
+          service_offering_id: string
+        }
+        Update: {
+          lead_id?: string
+          quantity?: number
+          service_offering_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_service_interests_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_service_interests_service_offering_id_fkey"
+            columns: ["service_offering_id"]
+            isOneToOne: false
+            referencedRelation: "service_offerings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          booking_requested: boolean | null
+          city: string | null
+          contact_count: number
+          converted_at: string | null
+          converted_client_id: string | null
+          converted_job_id: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          is_returning: boolean
+          last_contacted_at: string | null
+          last_submission_at: string | null
+          lat: number | null
+          lng: number | null
+          next_action_at: string | null
+          notes: string | null
+          owner: string | null
+          phone: string | null
+          postal_code: string | null
+          preferred_days: string | null
+          preferred_time: string | null
+          service_notes: string | null
+          source: string | null
+          state: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          submission_count: number
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          booking_requested?: boolean | null
+          city?: string | null
+          contact_count?: number
+          converted_at?: string | null
+          converted_client_id?: string | null
+          converted_job_id?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_returning?: boolean
+          last_contacted_at?: string | null
+          last_submission_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          next_action_at?: string | null
+          notes?: string | null
+          owner?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          preferred_days?: string | null
+          preferred_time?: string | null
+          service_notes?: string | null
+          source?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          submission_count?: number
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          booking_requested?: boolean | null
+          city?: string | null
+          contact_count?: number
+          converted_at?: string | null
+          converted_client_id?: string | null
+          converted_job_id?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_returning?: boolean
+          last_contacted_at?: string | null
+          last_submission_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          next_action_at?: string | null
+          notes?: string | null
+          owner?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          preferred_days?: string | null
+          preferred_time?: string | null
+          service_notes?: string | null
+          source?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          submission_count?: number
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -510,9 +518,32 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_open: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          kind: string | null
+          next_action_at: string | null
+          phone: string | null
+          scheduled_start: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      convert_lead_to_client_job: {
+        Args: {
+          p_job_status?: Database["public"]["Enums"]["job_status"]
+          p_lead_id: string
+        }
+        Returns: {
+          client_id: string
+          job_id: string
+        }[]
+      }
     }
     Enums: {
       job_status:
@@ -522,7 +553,13 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "canceled"
-      lead_status: "new" | "contacted" | "qualified" | "quoted" | "converted" | "lost"
+      lead_status:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "quoted"
+        | "converted"
+        | "lost"
       payment_method: "cash" | "card" | "check" | "ach" | "other"
       payment_status: "unpaid" | "partial" | "paid" | "refunded"
     }
@@ -632,6 +669,23 @@ export type Enums<
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
 export const Constants = {
   public: {
     Enums: {
@@ -643,53 +697,22 @@ export const Constants = {
         "completed",
         "canceled",
       ],
+      lead_status: [
+        "new",
+        "contacted",
+        "qualified",
+        "quoted",
+        "converted",
+        "lost",
+      ],
       payment_method: ["cash", "card", "check", "ach", "other"],
       payment_status: ["unpaid", "partial", "paid", "refunded"],
     },
   },
 } as const
 
-// Convenient type aliases for common operations
-export type Client = Tables<'clients'>
-export type ClientInsert = TablesInsert<'clients'>
-export type ClientUpdate = TablesUpdate<'clients'>
-
-export type Job = Tables<'jobs'>
-export type JobInsert = TablesInsert<'jobs'>
-export type JobUpdate = TablesUpdate<'jobs'>
-
-export type JobItem = Tables<'job_items'>
-export type JobItemInsert = TablesInsert<'job_items'>
-export type JobItemUpdate = TablesUpdate<'job_items'>
-
+// Convenience types for common operations
 export type ServiceOffering = Tables<'service_offerings'>
-export type ServiceOfferingInsert = TablesInsert<'service_offerings'>
-export type ServiceOfferingUpdate = TablesUpdate<'service_offerings'>
-
-export type Payment = Tables<'payments'>
-export type PaymentInsert = TablesInsert<'payments'>
-export type PaymentUpdate = TablesUpdate<'payments'>
-
-export type Attachment = Tables<'attachments'>
-export type AttachmentInsert = TablesInsert<'attachments'>
-export type AttachmentUpdate = TablesUpdate<'attachments'>
-
-export type UserProfile = Tables<'user_profiles'>
-export type UserProfileInsert = TablesInsert<'user_profiles'>
-export type UserProfileUpdate = TablesUpdate<'user_profiles'>
-
-export type JobFinancials = Tables<'job_financials'>
-
-export type Lead = Tables<'leads'>
 export type LeadInsert = TablesInsert<'leads'>
 export type LeadUpdate = TablesUpdate<'leads'>
-
-export type LeadServiceInterest = Tables<'lead_service_interests'>
 export type LeadServiceInterestInsert = TablesInsert<'lead_service_interests'>
-export type LeadServiceInterestUpdate = TablesUpdate<'lead_service_interests'>
-
-// Enum types for easier usage
-export type JobStatus = Enums<'job_status'>
-export type LeadStatus = Enums<'lead_status'>
-export type PaymentStatus = Enums<'payment_status'>
-export type PaymentMethod = Enums<'payment_method'>

@@ -18,7 +18,7 @@ import {
   useServicesByCategory, 
   calculateTotal
 } from "@/lib/services";
-import { createLeadFromQuote } from "@/lib/database";
+import { createLeadFromQuote, updateLeadBookingRequest } from "@/lib/database";
 import { createClient } from "@/lib/supabase/client";
 import type { PlaceDetails } from "@/lib/places-api";
 import { useUTMTracking } from "@/lib/utm";
@@ -91,9 +91,35 @@ export default function Home() {
   const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
   const [calculatedQuote, setCalculatedQuote] = useState<number | null>(null);
   const [showQuote, setShowQuote] = useState(false);
+  const [serviceRequested, setServiceRequested] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [isUpdatingLead, setIsUpdatingLead] = useState(false);
+
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '');
+    
+    // Limit to 10 digits
+    const limitedDigits = digits.slice(0, 10);
+    
+    // Format as (XXX) XXX-XXXX
+    if (limitedDigits.length >= 6) {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3, 6)}-${limitedDigits.slice(6)}`;
+    } else if (limitedDigits.length >= 3) {
+      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3)}`;
+    } else if (limitedDigits.length > 0) {
+      return `(${limitedDigits}`;
+    }
+    return '';
+  };
 
   const handleInputChange = (field: string, value: string | string[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'phone' && typeof value === 'string') {
+      const formattedPhone = formatPhoneNumber(value);
+      setFormData(prev => ({ ...prev, [field]: formattedPhone }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   };
   
   const handleServiceToggle = (serviceId: string, checked: boolean) => {
@@ -237,6 +263,7 @@ export default function Home() {
           console.log(`✅ Lead saved successfully with ${serviceCount} service${serviceCount !== 1 ? 's' : ''}`);
           if (leadResult?.leadId) {
             console.log(`Lead ID: ${leadResult.leadId}`);
+            setLeadId(leadResult.leadId); // Store the lead ID for later use
           }
         }
       } catch (error) {
@@ -250,6 +277,30 @@ export default function Home() {
     setCalculatedQuote(quote);
     setShowQuote(true);
     console.log("Form submitted:", formData, "Quote:", quote);
+  };
+
+  const handleRequestService = async () => {
+    if (!leadId) {
+      console.error("No lead ID available");
+      return;
+    }
+
+    setIsUpdatingLead(true);
+    try {
+      const supabase = createClient();
+      const { error } = await updateLeadBookingRequest(supabase, leadId, true);
+      
+      if (error) {
+        console.error("Error updating lead:", error);
+      } else {
+        console.log("✅ Lead updated with service request");
+        setServiceRequested(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error updating lead:", error);
+    } finally {
+      setIsUpdatingLead(false);
+    }
   };
 
   return (
@@ -331,6 +382,8 @@ export default function Home() {
                           onChange={(e) => handleInputChange("phone", e.target.value)}
                           className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                           placeholder="(815) 555-0123"
+                          pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                          title="Please enter a 10-digit phone number"
                           required
                         />
                       </div>
@@ -468,29 +521,71 @@ export default function Home() {
                         />
                       </div>
                       {showQuote && calculatedQuote !== null ? (
-                        <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
-                          <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
-                          <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
-                          <p className="text-sm opacity-90">
-                            {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
-                            {getTotalServiceCount() >= 5 && " • 20% MEGA Bundle discount applied!"}
-                            {getTotalServiceCount() >= 3 && getTotalServiceCount() < 5 && " • 10% Bundle discount applied!"}
-                            {formData.discountCode && formData.discountCode.toUpperCase().trim() === 'FIRST20' && " • Discount code applied!"}
-                          </p>
-                          <p className="text-sm opacity-90 mt-1">
-                            No hidden fees • Flat-rate pricing • Same-day response
-                          </p>
-                          <Button 
-                            type="button"
-                            onClick={() => {
-                              setShowQuote(false);
-                              setCalculatedQuote(null);
-                            }}
-                            className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
-                          >
-                            Edit Services
-                          </Button>
-                        </div>
+                        serviceRequested ? (
+                          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-center text-white mb-4">
+                            <h3 className="text-2xl font-bold mb-2">Thank You!</h3>
+                            <p className="text-lg mb-2">Someone will reach out to you shortly</p>
+                            <p className="text-sm opacity-90">
+                              Your quote: ${calculatedQuote} • {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
+                            </p>
+                            <Button 
+                              type="button"
+                              onClick={() => {
+                                setShowQuote(false);
+                                setCalculatedQuote(null);
+                                setServiceRequested(false);
+                                setLeadId(null);
+                                setFormData({
+                                  name: "",
+                                  email: "",
+                                  phone: "",
+                                  serviceQuantities: {},
+                                  address: "",
+                                  message: "",
+                                  discountCode: ""
+                                });
+                              }}
+                              className="mt-3 bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                            >
+                              Start New Quote
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
+                            <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
+                            <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
+                            <p className="text-sm opacity-90">
+                              {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
+                              {getTotalServiceCount() >= 5 && " • 20% MEGA Bundle discount applied!"}
+                              {getTotalServiceCount() >= 3 && getTotalServiceCount() < 5 && " • 10% Bundle discount applied!"}
+                              {formData.discountCode && formData.discountCode.toUpperCase().trim() === 'FIRST20' && " • Discount code applied!"}
+                            </p>
+                            <p className="text-sm opacity-90 mt-1">
+                              No hidden fees • Flat-rate pricing • Same-day response
+                            </p>
+                            <div className="flex gap-2 mt-3">
+                              <Button 
+                                type="button"
+                                onClick={() => {
+                                  setShowQuote(false);
+                                  setCalculatedQuote(null);
+                                }}
+                                variant="outline"
+                                className="flex-1 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
+                              >
+                                Edit Services
+                              </Button>
+                              <Button 
+                                type="button"
+                                onClick={handleRequestService}
+                                disabled={isUpdatingLead || !leadId}
+                                className="flex-1 bg-[#14213D] hover:bg-[#14213D]/80 text-white"
+                              >
+                                {isUpdatingLead ? "Requesting..." : "Request Service"}
+                              </Button>
+                            </div>
+                          </div>
+                        )
                       ) : (
                         <Button 
                           type="submit" 
@@ -590,6 +685,8 @@ export default function Home() {
                                   onChange={(e) => handleInputChange("phone", e.target.value)}
                                   className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="(815) 555-0123"
+                                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                                  title="Please enter a 10-digit phone number"
                                   required
                                 />
                               </div>
@@ -865,6 +962,8 @@ export default function Home() {
                                   onChange={(e) => handleInputChange("phone", e.target.value)}
                                   className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
                                   placeholder="(815) 555-0123"
+                                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                                  title="Please enter a 10-digit phone number"
                                   required
                                 />
                               </div>
@@ -1076,6 +1175,8 @@ export default function Home() {
                                 type="tel"
                                 value={formData.phone}
                                 onChange={(e) => handleInputChange("phone", e.target.value)}
+                                pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                                title="Please enter a 10-digit phone number"
                                 required
                               />
                             </div>
@@ -1270,6 +1371,8 @@ export default function Home() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
+                      pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                      title="Please enter a 10-digit phone number"
                       required
                     />
                   </div>
@@ -1553,6 +1656,8 @@ export default function Home() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
+                      pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+                      title="Please enter a 10-digit phone number"
                       required
                     />
                   </div>
