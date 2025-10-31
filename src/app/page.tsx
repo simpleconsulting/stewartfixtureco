@@ -826,29 +826,32 @@ export default function Home() {
       </section>
 
       {/* Additional Services */}
-      <section className="py-16 bg-[#E5E5E5] relative overflow-hidden">
-        <div className="absolute top-4 right-4 opacity-5 pointer-events-none">
-          <Image
-            src="/ceiling-fan-Installation.png"
-            alt=""
-            width={200}
-            height={200}
-            className="w-48 h-48 object-contain"
-          />
-        </div>
-        <div className="container mx-auto max-w-4xl px-4 text-center relative z-10">
-          <h2 className="text-3xl lg:text-4xl font-bold text-[#14213D] mb-6">
+      <section className="py-20 bg-[#E5E5E5]">
+        <div className="container mx-auto max-w-5xl px-4">
+          <h2 className="text-4xl lg:text-5xl font-bold text-[#14213D] mb-12 text-center">
             We Also Handle
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[#000000] font-medium">
-            <div>Cabinet Hardware</div>
-            <div>Smoke Detectors</div>
-            <div>Motion Sensors</div>
-            <div>Quick Fixes</div>
-            <div>Smart Switches</div>
-            <div>GFCI Outlets</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">Cabinet Hardware</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">Smoke Detectors</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">Motion Sensors</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">Quick Fixes</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">Smart Switches</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-[#FCA311]/20 hover:shadow-md transition-shadow">
+              <p className="text-lg font-semibold text-[#14213D]">GFCI Outlets</p>
+            </div>
           </div>
-          <p className="text-lg text-[#000000] mt-8 max-w-2xl mx-auto">
+          <p className="text-xl text-[#14213D] text-center max-w-3xl mx-auto leading-relaxed">
             From quick 30-minute fixes to full home upgrades — if it involves fixtures, switches, or hardware, we&apos;ve got you covered.
           </p>
         </div>
