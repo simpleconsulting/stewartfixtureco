@@ -469,6 +469,25 @@ export async function updateLeadStatus(
   })
 }
 
+// Delete a lead and its related service interests
+export async function deleteLead(
+  supabase: SupabaseClientType,
+  id: string
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { error } = await supabase
+      .from('leads')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      throw error
+    }
+
+    return { data: { success: true }, error: null }
+  })
+}
+
 // Convert lead to client
 export async function convertLeadToClient(
   supabase: SupabaseClientType,

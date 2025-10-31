@@ -6,9 +6,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UserCheck, Search, Phone, Mail, MapPin, Calendar } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { UserCheck, Search, Phone, Mail, MapPin, Calendar, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { fetchLeads, updateLeadStatus } from '@/lib/database'
+import { fetchLeads, updateLeadStatus, deleteLead } from '@/lib/database'
 import { getUTMSourceLabel } from '@/lib/utm'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database'
@@ -31,7 +41,9 @@ export default function LeadsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [error, setError] = useState<string | null>(null)
-  
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
   const supabase = createClient()
 
   const loadLeads = useCallback(async () => {
@@ -81,6 +93,36 @@ export default function LeadsPage() {
       toast.error('Error updating lead status', {
         description: errorMessage
       })
+    }
+  }
+
+  const handleDeleteLead = async () => {
+    if (!leadToDelete) return
+
+    try {
+      setIsDeleting(true)
+      const { data, error: deleteError } = await deleteLead(supabase, leadToDelete.id)
+
+      if (deleteError) {
+        toast.error('Failed to delete lead', {
+          description: deleteError
+        })
+      } else if (data?.success) {
+        toast.success('Lead deleted successfully', {
+          description: `${leadToDelete.full_name || 'Lead'} has been removed`
+        })
+        // Refresh the leads list
+        loadLeads()
+        // Close the dialog
+        setLeadToDelete(null)
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+      toast.error('Error deleting lead', {
+        description: errorMessage
+      })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -309,6 +351,14 @@ export default function LeadsPage() {
                     Call
                   </Button>
                 )}
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => setLeadToDelete(lead)}
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -324,13 +374,51 @@ export default function LeadsPage() {
             </div>
             <p className="text-sm text-gray-600">No leads found</p>
             <p className="text-xs text-gray-500">
-              {searchTerm || statusFilter !== 'all' 
-                ? 'Try adjusting your search or filter' 
+              {searchTerm || statusFilter !== 'all'
+                ? 'Try adjusting your search or filter'
                 : 'Leads will appear here when customers submit quotes'}
             </p>
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!leadToDelete} onOpenChange={(open: boolean) => !open && setLeadToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Lead</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <div>Are you sure you want to delete this lead?</div>
+                {leadToDelete && (
+                  <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                    <div className="font-medium text-gray-900">{leadToDelete.full_name || 'Anonymous Lead'}</div>
+                    {leadToDelete.email && (
+                      <div className="text-sm text-gray-600">{leadToDelete.email}</div>
+                    )}
+                    {leadToDelete.phone && (
+                      <div className="text-sm text-gray-600">{leadToDelete.phone}</div>
+                    )}
+                  </div>
+                )}
+                <div className="mt-2 text-sm">
+                  This action cannot be undone. This will permanently delete the lead and all associated service interests.
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteLead}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

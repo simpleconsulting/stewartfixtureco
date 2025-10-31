@@ -37,7 +37,7 @@ export function MobileNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-[calc(3rem+env(safe-area-inset-bottom))]">
       <div className="flex justify-around">
         {navItems.map((item) => {
           const Icon = item.icon
@@ -57,7 +57,7 @@ export function MobileNav() {
               )}
             >
               <Icon className={cn(
-                'w-5 h-5 mb-1 transition-all',
+                'w-5 h-5 mb-0.5 transition-all',
                 isActive ? 'text-[#FCA311] scale-110' : 'text-gray-500'
               )} />
               <span className={cn(
