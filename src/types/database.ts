@@ -713,6 +713,19 @@ export const Constants = {
 
 // Convenience types for common operations
 export type ServiceOffering = Tables<'service_offerings'>
+export type ServiceOfferingInsert = TablesInsert<'service_offerings'>
 export type LeadInsert = TablesInsert<'leads'>
 export type LeadUpdate = TablesUpdate<'leads'>
 export type LeadServiceInterestInsert = TablesInsert<'lead_service_interests'>
+export type JobItem = Tables<'job_items'>
+export type JobItemInsert = TablesInsert<'job_items'>
+export type Job = Tables<'jobs'>
+export type JobInsert = TablesInsert<'jobs'>
+export type Payment = Tables<'payments'>
+export type PaymentInsert = TablesInsert<'payments'>
+export type Client = Tables<'clients'>
+export type ClientInsert = TablesInsert<'clients'>
+export type JobFinancials = Tables<'job_financials'>
+export type JobStatus = Enums<'job_status'>
+export type PaymentStatus = Enums<'payment_status'>
+export type PaymentMethod = Enums<'payment_method'>

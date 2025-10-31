@@ -18,13 +18,11 @@ const SERVICE_CATEGORIES = {
     'Ceiling Fan Installation',
     'Standard Light Fixture Replacement',
     'Pendant/Chandelier Install (<10ft ceiling)',
-    'Pendant/Chandelier Install (10–14ft ceiling)',
     'Vanity Light Replacement',
     'Install Motion Sensor Light (Interior/Exterior)',
   ],
   'Switches & Outlets': [
     'Dimmer Switch Install',
-    '3-Way Switch Install/Troubleshoot',
     'Light Switch Replacement (Standard)',
     'Standard Outlet Replacement',
     'Install USB Outlet',
@@ -35,7 +33,6 @@ const SERVICE_CATEGORIES = {
   ],
   'Hardware & Other': [
     'Basic Cabinet Handle/Knob Swap (Up to 20)',
-    'TV Mounting with Cord Concealment',
     'Quick Visit (1 small task, <30 mins)',
   ],
 } as const

@@ -28,23 +28,23 @@ const topServices = [
     title: "Ceiling Fan Installation",
     headline: "Need a Ceiling Fan Installed? We'll Have it Spinning Today.",
     price: "$200",
-    description: "Professional installation at any height. No risk, no hassle, just cool comfort.",
+    description: "Professional installation at any height for safety and comfort.",
     image: "/ceiling-fan-Installation.png",
     iconColor: "from-[#FCA311] to-[#000000]"
   },
   {
-    title: "TV Mounting with Cord Concealment",
-    headline: "Mount Your TV Like a Pro with Hidden Cords for a Clean Look.",
-    price: "$225",
-    description: "Professional TV installation with cord concealment for a sleek, finished appearance.",
-    image: "/tv_mounthing.png",
+    title: "Device Installation",
+    headline: "Upgrade Your Home with Modern, Safe Device Installation.",
+    price: "$75",
+    description: "Switches, outlets, dimmers, and USB ports installed professionally.",
+    image: "/how-to-wire-and-install-single-pole-switches-1152330-03-6b86b53fbb3842d8873aa95868eb5093.png",
     iconColor: "from-[#14213D] to-[#FCA311]"
   },
   {
-    title: "Light Fixture & Pendant Swaps", 
+    title: "Light Fixture Swaps",
     headline: "Refresh Any Room with a Fast, Professional Light Fixture Swap.",
     price: "Starting at $150",
-    description: "Transform your space instantly. From vanity lights to chandeliers, we do it all.",
+    description: "Transform your space with vanity lights, pendants, and chandeliers.",
     image: "/pendant-light.png",
     iconColor: "from-[#000000] to-[#FCA311]"
   }
@@ -94,6 +94,10 @@ export default function Home() {
   const [serviceRequested, setServiceRequested] = useState(false);
   const [leadId, setLeadId] = useState<string | null>(null);
   const [isUpdatingLead, setIsUpdatingLead] = useState(false);
+
+  // Single modal state for all quote/booking buttons
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("Get Your Free Quote");
 
   const formatPhoneNumber = (value: string) => {
     // Remove all non-digits
@@ -160,22 +164,6 @@ export default function Home() {
   
   const getTotalServiceCount = () => {
     return Object.values(formData.serviceQuantities).reduce((sum, qty) => sum + qty, 0);
-  };
-  
-  const getCurrentTotal = () => {
-    if (loading || error) return 0;
-    return calculateTotal(Object.values(servicesByCategory).flat(), formData.serviceQuantities);
-  };
-  
-  const getCurrentTotalWithDiscount = () => {
-    const total = getCurrentTotal();
-    const serviceCount = getTotalServiceCount();
-    if (serviceCount >= 5) {
-      return Math.round(total * 0.8); // 20% off for 5+ services
-    } else if (serviceCount >= 3) {
-      return Math.round(total * 0.9); // 10% off for 3+ services
-    }
-    return total;
   };
 
   const applyDiscountCode = (total: number, discountCode: string) => {
@@ -338,7 +326,7 @@ export default function Home() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Dialog>
+                <Dialog open={quoteModalOpen} onOpenChange={setQuoteModalOpen}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
                       Free Instant Quote
@@ -346,7 +334,7 @@ export default function Home() {
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader className="text-center pb-4">
-                      <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Get Your Free Quote</DialogTitle>
+                      <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">{modalTitle}</DialogTitle>
                       <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-5 pt-2">
@@ -596,7 +584,7 @@ export default function Home() {
                         </Button>
                       )}
                       <p className="text-center text-sm text-[#000000] mt-3">
-                        {getSelectedServices().length === 0 ? "Please select at least one service" : "No obligation • Same-day response • Serving Middle TN"}
+                        {getSelectedServices().length === 0 ? "Please select at least one service" : "Same-day response • Serving Middle TN"}
                       </p>
                     </form>
                   </DialogContent>
@@ -638,184 +626,16 @@ export default function Home() {
                     </div>
                     <div className="mt-6 pt-4 border-t border-[#FCA311]/30 text-center">
                       <p className="text-[#000000] mb-4">Ready to get started?</p>
-                      {/* Avoid nested dialogs for better mobile UX. Consider closing this dialog before opening another. */}
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold">
-                            <Phone className="mr-2 h-5 w-5" />
-                            Book Service
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                          <DialogHeader className="text-center pb-4">
-                            <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Get Your Free Quote</DialogTitle>
-                            <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
-                          </DialogHeader>
-                          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="services-name" className="text-[#14213D] font-semibold">Full Name</Label>
-                                <Input
-                                  id="services-name"
-                                  value={formData.name}
-                                  onChange={(e) => handleInputChange("name", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="Enter your full name"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="services-email" className="text-[#14213D] font-semibold">Email Address</Label>
-                                <Input
-                                  id="services-email"
-                                  type="email"
-                                  value={formData.email}
-                                  onChange={(e) => handleInputChange("email", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="your@email.com"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="services-phone" className="text-[#14213D] font-semibold">Phone Number</Label>
-                                <Input
-                                  id="services-phone"
-                                  type="tel"
-                                  value={formData.phone}
-                                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="(815) 555-0123"
-                                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
-                                  title="Please enter a 10-digit phone number"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="services-address" className="text-[#14213D] font-semibold">Service Address</Label>
-                                <AddressAutocomplete
-                                  id="services-address"
-                                  value={formData.address}
-                                  onChange={(value) => handleInputChange("address", value)}
-                                  onPlaceSelected={setPlaceDetails}
-                                  className="mt-1"
-                                  placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <Label className="text-[#14213D] font-semibold">Services Needed</Label>
-                              <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                                {loading ? (
-                                  <div className="text-center py-4 text-[#14213D]">Loading services...</div>
-                                ) : error ? (
-                                  <div className="text-center py-4 text-red-600">Error loading services</div>
-                                ) : categories.map(category => (
-                                  <div key={category} className="mb-4">
-                                    <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                                    {servicesByCategory[category]?.map(service => (
-                                      <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
-                                        <div className="flex items-center justify-between">
-                                          <div className="flex items-center space-x-3 flex-1">
-                                            <Checkbox
-                                              id={`services-${service.id}`}
-                                              checked={service.id in formData.serviceQuantities}
-                                              onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                              className="border-[#FCA311]/30"
-                                            />
-                                            <Label 
-                                              htmlFor={`services-${service.id}`}
-                                              className="text-sm text-[#000000] font-medium cursor-pointer"
-                                            >
-                                              {service.name}
-                                            </Label>
-                                          </div>
-                                          {service.id in formData.serviceQuantities && (
-                                            <div className="flex items-center space-x-2">
-                                              <Label className="text-xs text-[#000000]">Qty:</Label>
-                                              <div className="flex items-center border border-[#FCA311]/30 rounded-md">
-                                                <Button
-                                                  type="button"
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                                  onClick={() => decrementQuantity(service.id)}
-                                                  disabled={formData.serviceQuantities[service.id] <= 1}
-                                                >
-                                                  <Minus className="h-3 w-3" />
-                                                </Button>
-                                                <Input
-                                                  type="number"
-                                                  min="1"
-                                                  max="10"
-                                                  value={formData.serviceQuantities[service.id] || 1}
-                                                  onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                                  onFocus={(e) => e.target.select()}
-                                                  className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
-                                                />
-                                                <Button
-                                                  type="button"
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                                  onClick={() => incrementQuantity(service.id)}
-                                                  disabled={formData.serviceQuantities[service.id] >= 10}
-                                                >
-                                                  <Plus className="h-3 w-3" />
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ))}
-                              </div>
-                              {getSelectedServices().length > 0 && (
-                                <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
-                                      <p className="text-xs text-[#000000]">
-                                        {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                                        {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
-                                        <div>
-                                          <p className="text-sm text-[#000000] line-through">${getCurrentTotal()}</p>
-                                          <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
-                                        </div>
-                                      ) : (
-                                        <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <Label htmlFor="services-message" className="text-[#14213D] font-semibold">Additional Details</Label>
-                              <Textarea
-                                id="services-message"
-                                value={formData.message}
-                                onChange={(e) => handleInputChange("message", e.target.value)}
-                                className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1 resize-none"
-                                placeholder="Tell us more about your project..."
-                                rows={3}
-                              />
-                            </div>
-                            <Button type="submit" className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] py-3 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 mt-6">
-                              Book Service
-                            </Button>
-                            <p className="text-center text-sm text-[#000000] mt-3">
-                              No obligation • Same-day response • Serving Middle TN
-                            </p>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
+                      <Button
+                        className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold"
+                        onClick={() => {
+                          setModalTitle("Get Your Free Quote");
+                          setQuoteModalOpen(true);
+                        }}
+                      >
+                        <Phone className="mr-2 h-5 w-5" />
+                        Book Service
+                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -836,7 +656,7 @@ export default function Home() {
                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
                       <Award className="h-7 w-7 text-white" />
                     </div>
-                    <span className="text-white font-medium text-lg">Flexible scheduling — no weeks-long waits</span>
+                    <span className="text-white font-medium text-lg">Flexible scheduling</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
@@ -918,189 +738,15 @@ export default function Home() {
                       </p>
                       <div className="flex flex-col items-center gap-4">
                         <div className="text-4xl font-bold text-[#FCA311] min-h-[48px] flex items-center justify-center">{service.price}</div>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
-                              Book Service
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader className="text-center pb-4">
-                              <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Schedule Your {service.title}</DialogTitle>
-                              <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-5 pt-2">
-                              <div>
-                                <Label htmlFor={`desktop-name-${index}`} className="text-[#14213D] font-semibold">Full Name</Label>
-                                <Input
-                                  id={`desktop-name-${index}`}
-                                  value={formData.name}
-                                  onChange={(e) => handleInputChange("name", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="Enter your full name"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`desktop-email-${index}`} className="text-[#14213D] font-semibold">Email Address</Label>
-                                <Input
-                                  id={`desktop-email-${index}`}
-                                  type="email"
-                                  value={formData.email}
-                                  onChange={(e) => handleInputChange("email", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="your@email.com"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`desktop-phone-${index}`} className="text-[#14213D] font-semibold">Phone Number</Label>
-                                <Input
-                                  id={`desktop-phone-${index}`}
-                                  type="tel"
-                                  value={formData.phone}
-                                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                                  className="border-[#FCA311]/30 focus:border-[#FCA311] focus:ring-[#FCA311]/20 mt-1"
-                                  placeholder="(815) 555-0123"
-                                  pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
-                                  title="Please enter a 10-digit phone number"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor={`desktop-address-${index}`}>Service Address</Label>
-                                <AddressAutocomplete
-                                  id={`desktop-address-${index}`}
-                                  value={formData.address}
-                                  onChange={(value) => handleInputChange("address", value)}
-                                  onPlaceSelected={setPlaceDetails}
-                                  placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-[#14213D] font-semibold">Services Needed</Label>
-                                <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
-                                  {loading ? (
-                                    <div className="text-center py-2 text-[#14213D] text-xs">Loading...</div>
-                                  ) : error ? (
-                                    <div className="text-center py-2 text-red-600 text-xs">Error</div>
-                                  ) : categories.map(category => (
-                                    <div key={category} className="mb-3">
-                                      <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
-                                      {servicesByCategory[category]?.map(svc => (
-                                        <div key={svc.id} className="mb-1">
-                                          <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-2 flex-1">
-                                              <Checkbox
-                                                id={`desktop-${index}-${svc.id}`}
-                                                checked={svc.id in formData.serviceQuantities}
-                                                onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
-                                                className="border-[#FCA311]/30"
-                                              />
-                                              <Label 
-                                                htmlFor={`desktop-${index}-${svc.id}`}
-                                                className="text-xs text-[#000000] font-medium cursor-pointer"
-                                              >
-                                                {svc.name}
-                                              </Label>
-                                            </div>
-                                            {svc.id in formData.serviceQuantities && (
-                                              <div className="flex items-center space-x-1">
-                                                <Label className="text-xs text-[#000000]">Qty:</Label>
-                                                <div className="flex items-center border border-[#FCA311]/30 rounded-md">
-                                                  <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
-                                                    onClick={() => decrementQuantity(svc.id)}
-                                                    disabled={formData.serviceQuantities[svc.id] <= 1}
-                                                  >
-                                                    <Minus className="h-2 w-2" />
-                                                  </Button>
-                                                  <Input
-                                                    type="number"
-                                                    min="1"
-                                                    max="10"
-                                                    value={formData.serviceQuantities[svc.id] || 1}
-                                                    onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                    onFocus={(e) => e.target.select()}
-                                                    className="w-8 h-6 text-xs text-center border-0 focus:ring-0 focus:border-0"
-                                                  />
-                                                  <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
-                                                    onClick={() => incrementQuantity(svc.id)}
-                                                    disabled={formData.serviceQuantities[svc.id] >= 10}
-                                                  >
-                                                    <Plus className="h-2 w-2" />
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  ))}
-                                </div>
-                                {getSelectedServices().length > 0 && (
-                                  <div className="mt-3 p-3 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-lg border border-[#FCA311]/30">
-                                    <div className="flex justify-between items-center">
-                                      <div>
-                                        <p className="text-xs font-semibold text-[#14213D]">Total:</p>
-                                        <p className="text-xs text-[#000000]">
-                                          {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                                        </p>
-                                      </div>
-                                      <p className="text-lg font-bold text-[#FCA311]">${getCurrentTotal()}</p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <Label htmlFor={`desktop-message-${index}`}>Additional Details</Label>
-                                <Textarea
-                                  id={`desktop-message-${index}`}
-                                  value={formData.message}
-                                  onChange={(e) => handleInputChange("message", e.target.value)}
-                                  placeholder="Tell us about your project needs..."
-                                  rows={3}
-                                />
-                              </div>
-                              {showQuote && calculatedQuote !== null ? (
-                                <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-4 text-center text-[#14213D]">
-                                  <h3 className="text-lg font-bold mb-1">Your Quote</h3>
-                                  <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
-                                  <p className="text-xs opacity-90">
-                                    {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} selected
-                                  </p>
-                                  <Button 
-                                    type="button"
-                                    onClick={() => {
-                                      setShowQuote(false);
-                                      setCalculatedQuote(null);
-                                    }}
-                                    className="mt-2 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30 text-xs py-1"
-                                  >
-                                    Edit Services
-                                  </Button>
-                                </div>
-                              ) : (
-                                <Button 
-                                  type="submit" 
-                                  disabled={getSelectedServices().length === 0}
-                                  className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50"
-                                >
-                                  Calculate Quote
-                                </Button>
-                              )}
-                            </form>
-                          </DialogContent>
-                        </Dialog>
+                        <Button
+                          className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full"
+                          onClick={() => {
+                            setModalTitle(`Schedule Your ${service.title}`);
+                            setQuoteModalOpen(true);
+                          }}
+                        >
+                          Book Service
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -1137,183 +783,15 @@ export default function Home() {
                     </p>
                     <div className="flex flex-col items-center gap-4">
                       <div className="text-3xl font-bold text-[#FCA311]">{service.price}</div>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full">
-                            Book Service
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                          <DialogHeader className="text-center pb-4">
-                            <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Schedule Your {service.title}</DialogTitle>
-                            <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
-                          </DialogHeader>
-                          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
-                            <div>
-                              <Label htmlFor={`mobile-name-${index}`}>Full Name</Label>
-                              <Input
-                                id={`mobile-name-${index}`}
-                                value={formData.name}
-                                onChange={(e) => handleInputChange("name", e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor={`mobile-email-${index}`}>Email</Label>
-                              <Input
-                                id={`mobile-email-${index}`}
-                                type="email"
-                                value={formData.email}
-                                onChange={(e) => handleInputChange("email", e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor={`mobile-phone-${index}`}>Phone Number</Label>
-                              <Input
-                                id={`mobile-phone-${index}`}
-                                type="tel"
-                                value={formData.phone}
-                                onChange={(e) => handleInputChange("phone", e.target.value)}
-                                pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
-                                title="Please enter a 10-digit phone number"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor={`mobile-address-${index}`}>Service Address</Label>
-                              <AddressAutocomplete
-                                id={`mobile-address-${index}`}
-                                value={formData.address}
-                                onChange={(value) => handleInputChange("address", value)}
-                                onPlaceSelected={setPlaceDetails}
-                                placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-[#14213D] font-semibold">Services Needed</Label>
-                              <div className="mt-2 max-h-32 overflow-y-auto border border-[#FCA311]/30 rounded-md p-3 bg-white">
-                                {loading ? (
-                                  <div className="text-center py-2 text-[#14213D] text-xs">Loading...</div>
-                                ) : error ? (
-                                  <div className="text-center py-2 text-red-600 text-xs">Error</div>
-                                ) : categories.map(category => (
-                                  <div key={category} className="mb-3">
-                                    <h4 className="font-semibold text-[#14213D] text-xs mb-1">{category}</h4>
-                                    {servicesByCategory[category]?.map(svc => (
-                                      <div key={svc.id} className="mb-1">
-                                        <div className="flex items-center justify-between">
-                                          <div className="flex items-center space-x-2 flex-1">
-                                            <Checkbox
-                                              id={`mobile-${index}-${svc.id}`}
-                                              checked={svc.id in formData.serviceQuantities}
-                                              onCheckedChange={(checked) => handleServiceToggle(svc.id, checked as boolean)}
-                                              className="border-[#FCA311]/30"
-                                            />
-                                            <Label 
-                                              htmlFor={`mobile-${index}-${svc.id}`}
-                                              className="text-xs text-[#000000] font-medium cursor-pointer"
-                                            >
-                                              {svc.name}
-                                            </Label>
-                                          </div>
-                                          {svc.id in formData.serviceQuantities && (
-                                            <div className="flex items-center space-x-1">
-                                              <Label className="text-xs text-[#000000]">Qty:</Label>
-                                              <div className="flex items-center border border-[#FCA311]/30 rounded-md">
-                                                <Button
-                                                  type="button"
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
-                                                  onClick={() => decrementQuantity(svc.id)}
-                                                  disabled={formData.serviceQuantities[svc.id] <= 1}
-                                                >
-                                                  <Minus className="h-2 w-2" />
-                                                </Button>
-                                                <Input
-                                                  type="number"
-                                                  min="1"
-                                                  max="10"
-                                                  value={formData.serviceQuantities[svc.id] || 1}
-                                                  onChange={(e) => handleServiceQuantityChange(svc.id, parseInt(e.target.value) || 1)}
-                                                  onFocus={(e) => e.target.select()}
-                                                  className="w-8 h-6 text-xs text-center border-0 focus:ring-0 focus:border-0"
-                                                />
-                                                <Button
-                                                  type="button"
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-6 w-6 p-0 hover:bg-[#FCA311]/10"
-                                                  onClick={() => incrementQuantity(svc.id)}
-                                                  disabled={formData.serviceQuantities[svc.id] >= 10}
-                                                >
-                                                  <Plus className="h-2 w-2" />
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ))}
-                              </div>
-                              {getSelectedServices().length > 0 && (
-                                <div className="mt-3 p-3 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-lg border border-[#FCA311]/30">
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <p className="text-xs font-semibold text-[#14213D]">Total:</p>
-                                      <p className="text-xs text-[#000000]">
-                                        {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                                      </p>
-                                    </div>
-                                    <p className="text-lg font-bold text-[#FCA311]">${getCurrentTotal()}</p>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <Label htmlFor={`mobile-message-${index}`}>Additional Details</Label>
-                              <Textarea
-                                id={`mobile-message-${index}`}
-                                value={formData.message}
-                                onChange={(e) => handleInputChange("message", e.target.value)}
-                                placeholder="Tell us about your project needs..."
-                                rows={3}
-                              />
-                            </div>
-                            {showQuote && calculatedQuote !== null ? (
-                              <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-4 text-center text-[#14213D]">
-                                <h3 className="text-lg font-bold mb-1">Your Quote</h3>
-                                <div className="text-2xl font-bold mb-1">${calculatedQuote}</div>
-                                <p className="text-xs opacity-90">
-                                  {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} selected
-                                </p>
-                                <Button 
-                                  type="button"
-                                  onClick={() => {
-                                    setShowQuote(false);
-                                    setCalculatedQuote(null);
-                                  }}
-                                  className="mt-2 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30 text-xs py-1"
-                                >
-                                  Edit Services
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button 
-                                type="submit" 
-                                disabled={getSelectedServices().length === 0}
-                                className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50"
-                              >
-                                Calculate Quote
-                              </Button>
-                            )}
-                          </form>
-                        </DialogContent>
-                      </Dialog>
+                      <Button
+                        className="bg-[#FCA311] hover:bg-[#FCA311]/80 text-[#14213D] px-8 py-3 rounded-xl font-semibold w-full"
+                        onClick={() => {
+                          setModalTitle(`Schedule Your ${service.title}`);
+                          setQuoteModalOpen(true);
+                        }}
+                      >
+                        Book Service
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -1333,204 +811,16 @@ export default function Home() {
             <p className="text-xl text-white/90 mb-6">
               Save 10% on 3+ services or 20% on 5+ services while upgrading your entire home.
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="lg" className="bg-white text-[#FCA311] hover:bg-white/90 px-10 py-4 text-lg font-semibold rounded-xl">
-                  Book Bundle Service
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl bg-gradient-to-br from-[#E5E5E5] to-white border-0 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="text-center pb-4">
-                  <DialogTitle className="text-2xl font-bold text-[#14213D] mb-2">Bundle Services & Save Up to 20%</DialogTitle>
-                  <p className="text-[#000000] text-base">Professional installation with transparent flat-rate pricing</p>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-5 pt-2">
-                  <div>
-                    <Label htmlFor="bundle-name">Full Name</Label>
-                    <Input
-                      id="bundle-name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bundle-email">Email</Label>
-                    <Input
-                      id="bundle-email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bundle-phone">Phone Number</Label>
-                    <Input
-                      id="bundle-phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                      pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
-                      title="Please enter a 10-digit phone number"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bundle-address">Service Address</Label>
-                    <AddressAutocomplete
-                      id="bundle-address"
-                      value={formData.address}
-                      onChange={(value) => handleInputChange("address", value)}
-                      onPlaceSelected={setPlaceDetails}
-                      placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-[#14213D] font-semibold">Services to Bundle (Need 3+ total services for 10% discount)</Label>
-                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                      {loading ? (
-                        <div className="text-center py-4 text-[#14213D]">Loading services...</div>
-                      ) : error ? (
-                        <div className="text-center py-4 text-red-600">Error loading services</div>
-                      ) : categories.map(category => (
-                        <div key={category} className="mb-4">
-                          <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                          {servicesByCategory[category]?.map(service => (
-                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3 flex-1">
-                                  <Checkbox
-                                    id={`bundle-${service.id}`}
-                                    checked={service.id in formData.serviceQuantities}
-                                    onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                    className="border-[#FCA311]/30"
-                                  />
-                                  <Label 
-                                    htmlFor={`bundle-${service.id}`}
-                                    className="text-sm text-[#14213D] font-medium cursor-pointer"
-                                  >
-                                    {service.name}
-                                  </Label>
-                                </div>
-                                {service.id in formData.serviceQuantities && (
-                                  <div className="flex items-center space-x-2">
-                                    <Label className="text-xs text-[#14213D]">Qty:</Label>
-                                    <div className="flex items-center border border-[#FCA311]/30 rounded-md">
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                        onClick={() => decrementQuantity(service.id)}
-                                        disabled={formData.serviceQuantities[service.id] <= 1}
-                                      >
-                                        <Minus className="h-3 w-3" />
-                                      </Button>
-                                      <Input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        value={formData.serviceQuantities[service.id] || 1}
-                                        onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                        onFocus={(e) => e.target.select()}
-                                        className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
-                                      />
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                        onClick={() => incrementQuantity(service.id)}
-                                        disabled={formData.serviceQuantities[service.id] >= 10}
-                                      >
-                                        <Plus className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                    {getSelectedServices().length > 0 && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-sm font-semibold text-[#14213D]">Bundle Total:</p>
-                            <p className="text-xs text-[#14213D]">
-                              {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                              {getTotalServiceCount() >= 3 ? " • 10% Bundle Discount Applied!" : " • Need 3+ for 10% off"}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
-                              <div>
-                                <p className="text-sm text-[#14213D] line-through">${getCurrentTotal()}</p>
-                                <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
-                              </div>
-                            ) : (
-                              <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="bundle-message">Additional Details</Label>
-                    <Textarea
-                      id="bundle-message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Tell us more about your project..."
-                      rows={3}
-                    />
-                  </div>
-                  {showQuote && calculatedQuote !== null ? (
-                    <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
-                      <h3 className="text-2xl font-bold mb-2">Your Bundle Quote</h3>
-                      <div className="text-4xl font-bold mb-2">
-                        ${getTotalServiceCount() >= 3 ? Math.round(calculatedQuote * 0.9) : calculatedQuote}
-                      </div>
-                      {getTotalServiceCount() >= 3 && (
-                        <div className="text-sm opacity-90 mb-2">
-                          <span className="line-through">${calculatedQuote}</span> • 10% Bundle Discount Applied!
-                        </div>
-                      )}
-                      <p className="text-sm opacity-90">
-                        {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
-                        {getTotalServiceCount() >= 3 ? ' • Bundle Discount Applied!' : ' • Need 3+ total services for 10% off'}
-                      </p>
-                      <p className="text-sm opacity-90 mt-1">
-                        No hidden fees • Flat-rate pricing • Same-day response
-                      </p>
-                      <Button 
-                        type="button"
-                        onClick={() => {
-                          setShowQuote(false);
-                          setCalculatedQuote(null);
-                        }}
-                        className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
-                      >
-                        Edit Services
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      type="submit" 
-                      disabled={getSelectedServices().length === 0}
-                      className="w-full bg-[#FCA311] hover:bg-[#FCA311]/80 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {getTotalServiceCount() >= 3 ? 'Calculate Bundle Quote (10% Off!)' : 'Calculate Quote'}
-                    </Button>
-                  )}
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Button
+              size="lg"
+              className="bg-white text-[#FCA311] hover:bg-white/90 px-10 py-4 text-lg font-semibold rounded-xl"
+              onClick={() => {
+                setModalTitle("Bundle Services & Save Up to 20%");
+                setQuoteModalOpen(true);
+              }}
+            >
+              Book Bundle Service
+            </Button>
           </div>
         </div>
       </section>
@@ -1552,13 +842,11 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[#000000] font-medium">
             <div>Cabinet Hardware</div>
-            <div>Safety Updates</div>
             <div>Smoke Detectors</div>
             <div>Motion Sensors</div>
             <div>Quick Fixes</div>
             <div>Smart Switches</div>
             <div>GFCI Outlets</div>
-            <div>TV Mounting</div>
           </div>
           <p className="text-lg text-[#000000] mt-8 max-w-2xl mx-auto">
             From quick 30-minute fixes to full home upgrades — if it involves fixtures, switches, or hardware, we&apos;ve got you covered.
@@ -1618,196 +906,18 @@ export default function Home() {
             Join hundreds of satisfied customers across Middle Tennessee
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="lg" variant="secondary" className="px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-[#FCA311] hover:bg-[#FCA311]/80 text-white border-0">
-                  <Phone className="mr-2 h-5 w-5" />
-                  Schedule Service Now
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Schedule Your Service</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name2">Full Name</Label>
-                    <Input
-                      id="name2"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email2">Email</Label>
-                    <Input
-                      id="email2"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone2">Phone Number</Label>
-                    <Input
-                      id="phone2"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                      pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
-                      title="Please enter a 10-digit phone number"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-[#14213D] font-semibold">Services Needed (Select All That Apply)</Label>
-                    <div className="mt-2 max-h-48 overflow-y-auto border border-[#FCA311]/30 rounded-md p-4 bg-white">
-                      {loading ? (
-                        <div className="text-center py-4 text-[#14213D]">Loading services...</div>
-                      ) : error ? (
-                        <div className="text-center py-4 text-red-600">Error loading services</div>
-                      ) : categories.map(category => (
-                        <div key={category} className="mb-4">
-                          <h4 className="font-semibold text-[#14213D] text-sm mb-2">{category}</h4>
-                          {servicesByCategory[category]?.map(service => (
-                            <div key={service.id} className="py-2 px-3 rounded-lg hover:bg-[#FCA311]/10 mb-1">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3 flex-1">
-                                  <Checkbox
-                                    id={`footer-${service.id}`}
-                                    checked={service.id in formData.serviceQuantities}
-                                    onCheckedChange={(checked) => handleServiceToggle(service.id, checked as boolean)}
-                                    className="border-[#FCA311]/30"
-                                  />
-                                  <Label 
-                                    htmlFor={`footer-${service.id}`}
-                                    className="text-sm text-[#14213D] font-medium cursor-pointer"
-                                  >
-                                    {service.name}
-                                  </Label>
-                                </div>
-                                {service.id in formData.serviceQuantities && (
-                                  <div className="flex items-center space-x-2">
-                                    <Label className="text-xs text-[#14213D]">Qty:</Label>
-                                    <div className="flex items-center border border-[#FCA311]/30 rounded-md">
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                        onClick={() => decrementQuantity(service.id)}
-                                        disabled={formData.serviceQuantities[service.id] <= 1}
-                                      >
-                                        <Minus className="h-3 w-3" />
-                                      </Button>
-                                      <Input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        value={formData.serviceQuantities[service.id] || 1}
-                                        onChange={(e) => handleServiceQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                                        onFocus={(e) => e.target.select()}
-                                        className="w-12 h-8 text-center border-0 focus:ring-0 focus:border-0"
-                                      />
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 hover:bg-[#FCA311]/10"
-                                        onClick={() => incrementQuantity(service.id)}
-                                        disabled={formData.serviceQuantities[service.id] >= 10}
-                                      >
-                                        <Plus className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                    {getSelectedServices().length > 0 && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-[#FCA311]/10 to-[#FCA311]/20 rounded-xl border border-[#FCA311]/30">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-sm font-semibold text-[#14213D]">Current Total:</p>
-                            <p className="text-xs text-[#14213D]">
-                              {getTotalServiceCount()} service{getTotalServiceCount() !== 1 ? 's' : ''}
-                              {getTotalServiceCount() >= 3 && " • Bundle discount applied!"}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            {getTotalServiceCount() >= 3 && getCurrentTotal() !== getCurrentTotalWithDiscount() ? (
-                              <div>
-                                <p className="text-sm text-[#14213D] line-through">${getCurrentTotal()}</p>
-                                <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotalWithDiscount()}</p>
-                              </div>
-                            ) : (
-                              <p className="text-2xl font-bold text-[#FCA311]">${getCurrentTotal()}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="address2">Service Address</Label>
-                    <AddressAutocomplete
-                      id="address2"
-                      value={formData.address}
-                      onChange={(value) => handleInputChange("address", value)}
-                      onPlaceSelected={setPlaceDetails}
-                      placeholder="Street address in Spring Hill, Thompson's Station, or Columbia TN"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="message2">Additional Details</Label>
-                    <Textarea
-                      id="message2"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Tell us more about your project..."
-                      rows={3}
-                    />
-                  </div>
-                  {showQuote && calculatedQuote !== null ? (
-                    <div className="bg-gradient-to-r from-[#FCA311] to-[#FCA311]/80 rounded-xl p-6 text-center text-[#14213D] mb-4">
-                      <h3 className="text-2xl font-bold mb-2">Your Quote</h3>
-                      <div className="text-4xl font-bold mb-2">${calculatedQuote}</div>
-                      <p className="text-sm opacity-90">
-                        {getTotalServiceCount()} total service{getTotalServiceCount() !== 1 ? 's' : ''} • {getSelectedServices().length} service type{getSelectedServices().length !== 1 ? 's' : ''} selected
-                      </p>
-                      <p className="text-sm opacity-90 mt-1">
-                        No hidden fees • Flat-rate pricing • Same-day response
-                      </p>
-                      <Button 
-                        type="button"
-                        onClick={() => {
-                          setShowQuote(false);
-                          setCalculatedQuote(null);
-                        }}
-                        className="mt-3 bg-[#14213D]/20 hover:bg-[#14213D]/30 text-[#14213D] border border-[#14213D]/30"
-                      >
-                        Edit Services
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      type="submit" 
-                      disabled={getSelectedServices().length === 0}
-                      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Calculate Quote
-                    </Button>
-                  )}
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-[#FCA311] hover:bg-[#FCA311]/80 text-white border-0"
+              onClick={() => {
+                setModalTitle("Schedule Your Service");
+                setQuoteModalOpen(true);
+              }}
+            >
+              <Phone className="mr-2 h-5 w-5" />
+              Schedule Service Now
+            </Button>
             
             <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold rounded-xl border-2 border-[#FCA311]/50 text-[#FCA311] hover:bg-[#FCA311]/10 backdrop-blur-sm" asChild>
               <a href="mailto:brent@stewartservicestn.com">
