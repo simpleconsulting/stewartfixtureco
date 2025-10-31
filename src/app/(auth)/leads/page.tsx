@@ -167,6 +167,20 @@ export default function LeadsPage() {
     return `sms:${lead.phone}?body=${encodedMessage}`
   }
 
+  const calculateQuotedAmount = (lead: Lead) => {
+    if (!lead.lead_service_interests || lead.lead_service_interests.length === 0) {
+      return null
+    }
+
+    const totalCents = lead.lead_service_interests.reduce((sum, interest) => {
+      const quantity = interest.quantity || 1
+      const priceCents = interest.service_offerings.base_price_cents || 0
+      return sum + (quantity * priceCents)
+    }, 0)
+
+    return totalCents / 100 // Convert cents to dollars
+  }
+
   const statusOptions = [
     { value: 'all', label: 'All Leads', count: leads.length },
     { value: 'new', label: 'New', count: leads.filter(l => l.status === 'new').length },
@@ -301,7 +315,7 @@ export default function LeadsPage() {
                   {lead.lead_service_interests && lead.lead_service_interests.length > 0 && (
                     <div className="mb-3">
                       <p className="text-xs text-gray-500 mb-1">Services interested in:</p>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 mb-2">
                         {lead.lead_service_interests.map((interest, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
                             {interest.service_offerings.name}
@@ -309,6 +323,11 @@ export default function LeadsPage() {
                           </Badge>
                         ))}
                       </div>
+                      {calculateQuotedAmount(lead) && (
+                        <div className="text-sm font-semibold text-[#FCA311]">
+                          Quoted: ${calculateQuotedAmount(lead)?.toFixed(2)} ({lead.lead_service_interests.length} service{lead.lead_service_interests.length !== 1 ? 's' : ''})
+                        </div>
+                      )}
                     </div>
                   )}
 

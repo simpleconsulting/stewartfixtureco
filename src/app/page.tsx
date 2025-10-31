@@ -27,7 +27,7 @@ const topServices = [
   {
     title: "Ceiling Fan Installation",
     headline: "Need a Ceiling Fan Installed? We'll Have it Spinning Today.",
-    price: "$200",
+    price: "$150",
     description: "Professional installation at any height for safety and comfort.",
     image: "/ceiling-fan-Installation.png",
     iconColor: "from-[#FCA311] to-[#000000]"
@@ -43,7 +43,7 @@ const topServices = [
   {
     title: "Light Fixture Swaps",
     headline: "Refresh Any Room with a Fast, Professional Light Fixture Swap.",
-    price: "Starting at $150",
+    price: "Starting at $125",
     description: "Transform your space with vanity lights, pendants, and chandeliers.",
     image: "/pendant-light.png",
     iconColor: "from-[#000000] to-[#FCA311]"
