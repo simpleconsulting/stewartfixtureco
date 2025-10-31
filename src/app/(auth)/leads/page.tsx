@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { UserCheck, Search, Phone, Mail, MapPin, Calendar, Trash2 } from 'lucide-react'
+import { UserCheck, Search, Phone, Mail, MapPin, Calendar, Trash2, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { fetchLeads, updateLeadStatus, deleteLead } from '@/lib/database'
 import { getUTMSourceLabel } from '@/lib/utm'
@@ -141,11 +141,30 @@ export default function LeadsPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
       day: 'numeric',
       year: 'numeric'
     })
+  }
+
+  const generateSMSLink = (lead: Lead) => {
+    if (!lead.phone) return ''
+
+    // Extract first name from full_name (everything before first space)
+    const firstName = lead.full_name?.split(' ')[0] || 'there'
+
+    // Get first service name if available
+    const firstService = lead.lead_service_interests?.[0]?.service_offerings?.name || 'your inquiry'
+
+    // Build the message
+    const message = `Hey ${firstName}, this is Brent with Stewart Services. I just got your inquiry about ${firstService}. I'm going to give you a call in a second to talk through details. I just wanted to make sure you know who it was. Thanks!`
+
+    // URL-encode the message
+    const encodedMessage = encodeURIComponent(message)
+
+    // Return SMS link (works on both iOS and Android)
+    return `sms:${lead.phone}?body=${encodedMessage}`
   }
 
   const statusOptions = [
@@ -338,6 +357,17 @@ export default function LeadsPage() {
                   >
                     <Mail className="w-3 h-3 mr-1" />
                     Email
+                  </Button>
+                )}
+                {lead.phone && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    onClick={() => window.open(generateSMSLink(lead), '_blank')}
+                  >
+                    <MessageSquare className="w-3 h-3 mr-1" />
+                    Text
                   </Button>
                 )}
                 {lead.phone && (
