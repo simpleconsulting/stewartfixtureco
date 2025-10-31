@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, MapPin, Phone, Mail, Star, Award, Users, Shield, Plus, Minus } from "lucide-react";
+import { CheckCircle, MapPin, Phone, Mail, Award, Users, Shield, Plus, Minus } from "lucide-react";
 import { 
   useServicesByCategory, 
   calculateTotal
@@ -308,12 +308,6 @@ export default function Home() {
                     height={120}
                     className="w-auto h-24 lg:h-32 filter brightness-0 invert"
                   />
-                </div>
-                <div className="flex items-center justify-center lg:justify-start gap-2">
-                  <div className="flex text-[#FCA311]">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current" />)}
-                  </div>
-                  <span className="text-white/90 text-lg font-medium">5-Star Local Service</span>
                 </div>
               </div>
               
