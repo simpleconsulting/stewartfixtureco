@@ -157,6 +157,104 @@ export async function fetchServicesByIds(
   })
 }
 
+// Fetch all services (including inactive) for admin purposes
+export async function fetchAllServices(
+  supabase: SupabaseClientType
+): Promise<{ data: ServiceOffering[] | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('service_offerings')
+      .select('*')
+      .order('name')
+
+    return { data, error }
+  })
+}
+
+// Create a new service offering
+export async function createService(
+  supabase: SupabaseClientType,
+  serviceData: {
+    name: string
+    description?: string
+    base_price_cents: number
+    default_duration_minutes?: number | null
+    unit?: string
+    is_active?: boolean
+  }
+): Promise<{ data: ServiceOffering | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('service_offerings')
+      .insert([{
+        name: serviceData.name,
+        description: serviceData.description || null,
+        base_price_cents: serviceData.base_price_cents,
+        default_duration_minutes: serviceData.default_duration_minutes || null,
+        unit: serviceData.unit || 'flat',
+        is_active: serviceData.is_active ?? true
+      }])
+      .select()
+      .single()
+
+    return { data, error }
+  })
+}
+
+// Update an existing service offering
+export async function updateService(
+  supabase: SupabaseClientType,
+  id: string,
+  serviceData: {
+    name?: string
+    description?: string
+    base_price_cents?: number
+    default_duration_minutes?: number | null
+    unit?: string
+    is_active?: boolean
+  }
+): Promise<{ data: ServiceOffering | null; error: string | null }> {
+  return executeQuery(async () => {
+    const { data, error } = await supabase
+      .from('service_offerings')
+      .update({
+        ...serviceData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single()
+
+    return { data, error }
+  })
+}
+
+// Delete a service (soft delete by setting is_active to false)
+export async function deleteService(
+  supabase: SupabaseClientType,
+  id: string,
+  hardDelete: boolean = false
+): Promise<{ data: { success: boolean } | null; error: string | null }> {
+  return executeQuery(async () => {
+    if (hardDelete) {
+      const { error } = await supabase
+        .from('service_offerings')
+        .delete()
+        .eq('id', id)
+
+      return { data: { success: !error }, error }
+    } else {
+      // Soft delete
+      const { error } = await supabase
+        .from('service_offerings')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('id', id)
+
+      return { data: { success: !error }, error }
+    }
+  })
+}
+
 // Lead-specific database functions
 
 // Create a lead from quote form data

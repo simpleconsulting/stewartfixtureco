@@ -26,7 +26,7 @@ export default async function AuthLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="pb-16 px-4 pt-6">
+      <main className="pb-20 px-4 pt-6">
         {children}
       </main>
       <MobileNav />
