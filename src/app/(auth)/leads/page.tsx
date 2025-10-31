@@ -331,12 +331,13 @@ export default function LeadsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="space-y-2">
+                {/* Status Dropdown */}
                 <Select
                   value={lead.status}
                   onValueChange={(newStatus) => handleStatusChange(lead.id, newStatus as Database['public']['Enums']['lead_status'])}
                 >
-                  <SelectTrigger className="flex-1 h-8">
+                  <SelectTrigger className="w-full h-8">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -348,47 +349,51 @@ export default function LeadsPage() {
                     <SelectItem value="lost">Lost</SelectItem>
                   </SelectContent>
                 </Select>
-                {lead.email && (
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {lead.email && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => window.open(`mailto:${lead.email}`, '_blank')}
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Email
+                    </Button>
+                  )}
+                  {lead.phone && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => window.open(generateSMSLink(lead), '_blank')}
+                    >
+                      <MessageSquare className="w-3 h-3 mr-1" />
+                      Text
+                    </Button>
+                  )}
+                  {lead.phone && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8"
+                      onClick={() => window.open(`tel:${lead.phone}`, '_blank')}
+                    >
+                      <Phone className="w-3 h-3 mr-1" />
+                      Call
+                    </Button>
+                  )}
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
                     className="h-8"
-                    onClick={() => window.open(`mailto:${lead.email}`, '_blank')}
+                    onClick={() => setLeadToDelete(lead)}
                   >
-                    <Mail className="w-3 h-3 mr-1" />
-                    Email
+                    <Trash2 className="w-3 h-3" />
                   </Button>
-                )}
-                {lead.phone && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8"
-                    onClick={() => window.open(generateSMSLink(lead), '_blank')}
-                  >
-                    <MessageSquare className="w-3 h-3 mr-1" />
-                    Text
-                  </Button>
-                )}
-                {lead.phone && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8"
-                    onClick={() => window.open(`tel:${lead.phone}`, '_blank')}
-                  >
-                    <Phone className="w-3 h-3 mr-1" />
-                    Call
-                  </Button>
-                )}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="h-8"
-                  onClick={() => setLeadToDelete(lead)}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
